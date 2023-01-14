@@ -55,3 +55,5 @@
 ## Client.exe 特性详解
 通过`Cconfig.json`定义api伺服器地址。通过api伺服器上的`client.json`执行对资源的管理操作。验证算法为`SHA512`.
 
+## 下载地址
+一个可用的镜像是https://alist.mczyx.online/psbali
