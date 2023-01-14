@@ -1,0 +1,9 @@
+test/
+build/
+dist/
+.minecraft/
+*.ico
+*.json
+*.exe
+*.zip
+*.spec
