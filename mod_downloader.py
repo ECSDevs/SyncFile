@@ -36,17 +36,18 @@ def showDescription(modId):
     print('this mod\'s description:',requests.get(apiUrl,headers=curseAPI.headers).json()["data"])
 
 # show mod name
-def showModName(modId):
+def showModName(modId,reqtype):
     apiUrl = "https://api.curseforge.com/v1/mods/%s"%modId
     data = requests.get(apiUrl,headers=curseAPI.headers).json()["data"]
-    print(data["name"])
+    reqtypes = ["NotKnown","EmbeddedLibrary","OptionalDependency","RequiredDependency","Tool","Incompatible","Include"]
+    print(data["name"],"[%s]"%(reqtypes[reqtype]))
     return data
 
 # show requirements
 def showRequirements(reqdata):
     print("requirements:")
     for req in reqdata:
-        showModName(req["modId"])
+        showModName(req["modId"],req["relationType"])
 
 mcv = input("Minecraft Version? : ")
 ml = int(input("ModLoader Type? (see mod_downloader_readme.txt): "))
