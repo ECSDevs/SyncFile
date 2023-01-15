@@ -60,7 +60,11 @@ while True:
     modinfo = searchMod(cmd2,mcv,ml)["data"]
     for mod in range(len(modinfo)):
         print("[%d]"%mod,modinfo[mod]["name"])
-    which = int(input("select: "))
+    which = input("select: ")
+    if which:
+        which = int(which)
+    else:
+        continue
     showDescription(modinfo[which]["id"])
     for version in modinfo[which]["latestFilesIndexes"]:
         if version["gameVersion"]==mcv and version["modLoader"]==ml:
