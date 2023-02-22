@@ -10,6 +10,7 @@ def saveConfig():
     print("config saved")
 # load my config
 def loadConfig():
+    global myConfig
     try: 
         configfile = open('moddl.cfg')
         myConfig = json.load(configfile)
