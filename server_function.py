@@ -8,7 +8,6 @@ app = Flask(__name__)
 @app.route("/<path:path>")
 def server(path):
     if path=='client.json':
-        os.system("server.exe")
         with open('client.json')as f:
             return f.read()
     with open(path,'rb')as f:

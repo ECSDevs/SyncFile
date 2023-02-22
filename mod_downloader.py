@@ -48,10 +48,14 @@ def searchMod(modname,ver,ml):
 def downloadMod(fileId,modId):
     apiUrl = "https://api.curseforge.com/v1/mods/%s/files/%s"%(modId,fileId)
     data = requests.get(apiUrl,headers=myConfig['headers']).json()["data"]
-    print("start to download",data["downloadUrl"].split('/')[-1])
+    downloadFile(data["downloadUrl"])
+    return data
+
+# file downloader
+def downloadFile(dlUrl):
+    print("start to download",dlUrl.split('/')[-1])
     chooseChannel(data["downloadUrl"])
     print("downloaded")
-    return data
 
 # download channel chooser
 def chooseChannel(dlUrl):
