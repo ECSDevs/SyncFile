@@ -66,8 +66,8 @@ def chooseChannel(dlUrl):
 
 # self-build downloader
 def downloader(dlUrl):
-    with open(data["downloadUrl"].split('/')[-1],'wb')as f:
-        f.write(requests.get(data["downloadUrl"]).content)
+    with open(dlUrl.split('/')[-1],'wb')as f:
+        f.write(requests.get(dlUrl).content)
 
 # mod description shower
 def showDescription(modId):
