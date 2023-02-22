@@ -3,7 +3,7 @@ import requests, json, os
 # config
 myConfig = {}
 # save my config
-def saveConfig(key,value):
+def saveConfig():
     configfile = open('moddl.cfg','w')
     json.dump(myConfig,configfile)
     configfile.close()
@@ -87,9 +87,11 @@ def showRequirements(reqdata):
     for req in reqdata:
         showModName(req["modId"],req["relationType"])
 
+loadConfig()
 mcv = input("Minecraft Version? : ")
 ml = int(input("ModLoader Type? (see mod_downloader_readme.txt): "))
 myConfig["headers"]["x-api-key"] = input("please enter your own api key :")
+saveConfig()
 
 print("Warning: Any silent crash could be due to network reasons! Make sure you have access to api.curseforge.com!")
 
