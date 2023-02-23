@@ -15,4 +15,5 @@ def server(path):
 
 if __name__ == '__main__':
     app.debug = True
+    os.system("start python server_autogen.py")
     app.run(host="127.0.0.1",port=7809)
