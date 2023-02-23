@@ -8,7 +8,6 @@ app = Flask(__name__)
 @app.route("/<path:path>")
 def server(path):
     if path=='client.json':
-        os.system("server.exe")
         with open('client.json')as f:
             return f.read()
     with open(path,'rb')as f:
@@ -16,4 +15,5 @@ def server(path):
 
 if __name__ == '__main__':
     app.debug = True
+    os.system("start python server_autogen.py")
     app.run(host="127.0.0.1",port=7809)
