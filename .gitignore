@@ -2,6 +2,7 @@ test/
 build/
 dist/
 .minecraft/
+__pycache__/
 *.ico
 *.json
 *.exe
