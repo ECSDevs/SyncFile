@@ -1,4 +1,4 @@
-import requests, json, os
+import requests, json, os, down
 
 # config
 myConfig = {}
@@ -48,30 +48,8 @@ def searchMod(modname,ver,ml):
 def downloadMod(fileId,modId):
     apiUrl = "https://api.curseforge.com/v1/mods/%s/files/%s"%(modId,fileId)
     data = requests.get(apiUrl,headers=myConfig['headers']).json()["data"]
-    downloadFile(data["downloadUrl"])
+    down.downloadFile(data["downloadUrl"])
     return data
-
-# file downloader
-def downloadFile(dlUrl):
-    print("start to download",dlUrl.split('/')[-1])
-    chooseChannel(data["downloadUrl"])
-    print("downloaded")
-
-# download channel chooser
-def chooseChannel(dlUrl):
-    if os.path.isfile('wget_ext.exe'):
-        print('You have WGET extension! using wget to download.')
-        stat = os.system('wget \"%s\"'%(dlUrl))
-        if stat:
-            print("something went wrong. file may lose. you can try again.")
-    else:
-        print("oh no! you didnt download wget extension! using traditional download method. file may broken.")
-        downloader(dlUrl)
-
-# self-build downloader
-def downloader(dlUrl):
-    with open(dlUrl.split('/')[-1],'wb')as f:
-        f.write(requests.get(dlUrl).content)
 
 # mod description shower
 def showDescription(modId):
