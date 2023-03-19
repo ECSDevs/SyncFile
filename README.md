@@ -1,4 +1,5 @@
 # MCSMT ( Minecraft Server Manage Tool)
+讨论用QQ频道：频道号: r2mjr3649b，频道名：RIAN真会玩，在【项目相关】板块讨论
 ## 运行方式
 直接运行源代码   
 依赖：requests, flask, watchdog  
