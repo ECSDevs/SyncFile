@@ -19,7 +19,7 @@ pip install requests wget flask watchdog
 写一个`Cconfig.json`，像这样：
 ```json
 {
-    "requestURL": "http://api.myserver.online/"
+    "requestURL": "http://api.example.com/"
 }
 ```
 启动`client.py`即可同步
