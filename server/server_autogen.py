@@ -5,15 +5,16 @@ from time import sleep
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from os import system
+from sys import argv
 
 class OnMyWatch:
     # Set the directory on watch
-    watchDirectory = "."
-    def __init__(self):
+    def __init__(self,watchdir):
         self.observer = Observer()
+        self.watchingDirectory = watchdir
     def run(self):
         event_handler = Handler()
-        self.observer.schedule(event_handler, self.watchDirectory, recursive = True)
+        self.observer.schedule(event_handler, self.watchingDirectory, recursive = True)
         self.observer.start()
         try:
             while True:
@@ -31,6 +32,12 @@ class Handler(FileSystemEventHandler):
         print("WatchDog FileSystemEventHandler found a event. regenerating client.json.")
         system('server_generate')
 
+def findArg():
+    for i in range(len(argv)):
+        if argv[i]=='-d' and i+1<len(argv):
+            return argv[i+1]
+    return "res"
+
 if __name__ == '__main__':
-    watch = OnMyWatch()
+    watch = OnMyWatch(findArg())
     watch.run()
