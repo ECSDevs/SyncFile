@@ -1,4 +1,5 @@
-import requests, os
+from requests import get as webget
+from os import path as ospath, system as ossystem
 
 # file downloader
 def downloadFile(dlUrl,targetPath="."):
@@ -8,9 +9,9 @@ def downloadFile(dlUrl,targetPath="."):
 
 # download channel chooser
 def chooseChannel(dlUrl,targetPath):
-    if os.path.isfile('wget_ext.exe'):
+    if ospath.isfile('wget_ext.exe'):
         print('You have WGET extension! using wget to download.')
-        stat = os.system('wget \"%s\" -o \"%s\"'%(dlUrl,targetPath))
+        stat = ossystem('wget \"%s\" -o \"%s\"'%(dlUrl,targetPath))
         if stat:
             print("something went wrong. file may lose. you can try again.")
     else:
@@ -20,4 +21,4 @@ def chooseChannel(dlUrl,targetPath):
 # self-build downloader
 def downloader(dlUrl,targetPath):
     with open(targetPath,'wb')as f:
-        f.write(requests.get(dlUrl).content)
+        f.write(webget(dlUrl).content)

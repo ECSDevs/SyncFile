@@ -1,11 +1,13 @@
-import requests, json, os, down
+from requests import get as webget
+from down import downloadFile
+from json import load,dump
 
 # config
 myConfig = {}
 # save my config
 def saveConfig():
     configfile = open('moddl.cfg','w')
-    json.dump(myConfig,configfile)
+    dump(myConfig,configfile)
     configfile.close()
     print("config saved")
 # load my config
@@ -13,7 +15,7 @@ def loadConfig():
     global myConfig
     try: 
         configfile = open('moddl.cfg')
-        myConfig = json.load(configfile)
+        myConfig = load(configfile)
         configfile.close()
     except: 
         print("no config file found. loaded default config.")
@@ -41,25 +43,25 @@ def searchMod(modname,ver,ml):
         'modLoaderType': ml,
         'searchFilter': modname
     }
-    r = requests.get(apiUrl, params = params, headers = myConfig['headers'])
+    r = webget(apiUrl, params = params, headers = myConfig['headers'])
     return r.json()
 
 # mod file downloading module
 def downloadMod(fileId,modId):
     apiUrl = "https://api.curseforge.com/v1/mods/%s/files/%s"%(modId,fileId)
-    data = requests.get(apiUrl,headers=myConfig['headers']).json()["data"]
-    down.downloadFile(data["downloadUrl"])
+    data = webget(apiUrl,headers=myConfig['headers']).json()["data"]
+    downloadFile(data["downloadUrl"])
     return data
 
 # mod description shower
 def showDescription(modId):
     apiUrl = "https://api.curseforge.com/v1/mods/%s/description"%modId
-    print('this mod\'s description:',requests.get(apiUrl,headers=myConfig['headers']).json()["data"])
+    print('this mod\'s description:',webget(apiUrl,headers=myConfig['headers']).json()["data"])
 
 # show mod name
 def showModName(modId,reqtype):
     apiUrl = "https://api.curseforge.com/v1/mods/%s"%modId
-    data = requests.get(apiUrl,headers=myConfig['headers']).json()["data"]
+    data = webget(apiUrl,headers=myConfig['headers']).json()["data"]
     reqtypes = ["NotKnown","EmbeddedLibrary","OptionalDependency","RequiredDependency","Tool","Incompatible","Include"]
     print(data["name"],"[%s]"%(reqtypes[reqtype]))
     return data

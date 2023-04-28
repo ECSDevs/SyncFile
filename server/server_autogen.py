@@ -1,10 +1,10 @@
 # code from https://www.geeksforgeeks.org/create-a-watchdog-in-python-to-look-for-filesystem-changes/
 
 # import time module, Observer, FileSystemEventHandler
-import time
+from time import sleep
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import os
+from os import system
 
 class OnMyWatch:
     # Set the directory on watch
@@ -17,7 +17,7 @@ class OnMyWatch:
         self.observer.start()
         try:
             while True:
-                time.sleep(5)
+                sleep(5)
         except:
             self.observer.stop()
             print("Observer Stopped")
@@ -29,7 +29,7 @@ class Handler(FileSystemEventHandler):
         if event.is_directory:
             return None
         print("WatchDog FileSystemEventHandler found a event. regenerating client.json.")
-        os.system('python server.py')
+        system('server_generate')
 
 if __name__ == '__main__':
     watch = OnMyWatch()
