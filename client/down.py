@@ -9,9 +9,9 @@ def downloadFile(dlUrl,targetPath="."):
 
 # download channel chooser
 def chooseChannel(dlUrl,targetPath):
-    if ospath.isfile('wget_ext.exe'):
+    if ospath.isfile('wget.exe'):
         print('You have WGET extension! using wget to download.')
-        stat = ossystem('wget \"%s\" -o \"%s\"'%(dlUrl,targetPath))
+        stat = ossystem('wget \"%s\" -O \"%s\"'%(dlUrl,targetPath))
         if stat:
             print("something went wrong. file may lose. you can try again.")
     else:
