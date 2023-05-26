@@ -25,12 +25,12 @@ pip install <whl文件路径> --force-reinstall
 ```
 
 ## 服务端（`server`文件夹）
-1. 首先用`config_gen.py`生成服务器配置（whl版本命令：`python -m mcsmt.server.config_gen`，任何路径下都可用）
-2.1. 静态服务端
-2.1.1. 直接启动`server_generate.py`,生成引导之后打包传上服务器（whl版本命令：`python -m mcsmt.server.server_generate`，任何路径下都可用）
-2.2. 动态服务端
-2.2.1. 直接启动`simple_server.py`即可启动便捷式服务器（whl版本命令：`python -m mcsmt.server.simple_server`，任何路径下都可用）
-2.2.2. 高级模式：linux安装wsgi服务器后，启动simple_server模块内的app程序
+1. 首先用`config_gen.py`生成服务器配置（whl版本命令：`python -m mcsmt.server.config_gen`，任何路径下都可用）  
+2.1. 静态服务端  
+2.1.1. 直接启动`server_generate.py`,生成引导之后打包传上服务器（whl版本命令：`python -m mcsmt.server.server_generate`，任何路径下都可用）  
+2.2. 动态服务端  
+2.2.1. 直接启动`simple_server.py`即可启动便捷式服务器（whl版本命令：`python -m mcsmt.server.simple_server`，任何路径下都可用）  
+2.2.2. 高级模式：linux安装wsgi服务器后，启动simple_server模块内的app程序  
 
 ## 客户端（`client`文件夹）
 写一个`Cconfig.json`，像这样：
