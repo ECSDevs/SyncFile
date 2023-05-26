@@ -1,5 +1,5 @@
-from requests import get as webget
-from down import downloadFile
+from httpx import get as webget
+from .down import downloadFile
 from json import load,dump
 
 # config

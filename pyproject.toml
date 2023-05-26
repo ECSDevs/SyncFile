@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcsmt"
+version = "0.2.7"
+authors = [
+  { name="lghilb-yu", email="2438926613@qq.com" },
+]
+description = "Simple file synchronization service (clients in the same package)"
+readme = "README.md"
+requires-python = ">=3.0"
+license = {file = "LICENCE"}
+maintainers = [
+  {name = "WhatTheHell", email = "wth@zyxblog.net" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+]
+dependencies = [ # Optional
+  "dnspython",
+  "Flask",
+  "httpx",
+  "watchdog"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/PsBash-Team/MCSMT"
+"Bug Tracker" = "https://github.com/PsBash-Team/MCSMT/issues"
+"Support Me" = "https://afdian.net/a/mcsmt_transfer_tool"

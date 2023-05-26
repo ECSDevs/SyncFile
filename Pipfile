@@ -4,6 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+httpx = "*"
+dnspython = "*"
+Flask = "*"
+watchdog = "*"
+
 
 [dev-packages]
 
