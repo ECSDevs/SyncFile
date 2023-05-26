@@ -1,8 +1,8 @@
-test/
-build/
-dist/
-.minecraft/
-__pycache__/
+**/test/
+**/build/
+**/dist/
+**/.minecraft/
+**/__pycache__/
 *.ico
 *.json
 *.exe
@@ -10,3 +10,4 @@ __pycache__/
 *.spec
 *.jar
 *.cfg
+*.log

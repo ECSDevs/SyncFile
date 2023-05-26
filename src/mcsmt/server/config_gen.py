@@ -1,4 +1,4 @@
-import json
+from json import load, dump
 
 # mode select
 mode = input("mode(add/rewrite): ")
@@ -6,7 +6,7 @@ mode = input("mode(add/rewrite): ")
 # mode
 if mode == "add":
     with open("config.json")as f:
-        config=json.load(f)
+        config=load(f)
 elif mode == "rewrite":
     config=[]
 else:
@@ -46,4 +46,4 @@ while True:
 
 # write to config file
 with open("config.json",'w')as f:
-    json.dump(config,f)
+    dump(config,f)
