@@ -3,6 +3,8 @@ from os import path as ospath, system as ossystem
 from logging import getLogger
 from logging.handlers import TimedRotatingFileHandler
 from hashlib import sha512
+from .ezdns import doh
+from random import randint
 
 # init logger
 logger = getLogger(__name__)
@@ -58,14 +60,18 @@ class Stat:
 
 
 # file downloader
-def downloadFile(dlUrl,targetPath=".",host="",hexcode=''):
+def downloadFile(dlUrl,targetPath=".",host="",hexcode='',preferHostType='A',dns='223.5.5.5'):
     logger.info("start to download %s"%dlUrl.split('/')[-1])
+    if not host:
+        hosts=doh(dlUrl.split('//')[1].split('/')[0],preferHostType,dns)
+        host=hosts[randint(0,len(hosts)-1)]
     chooseChannel(dlUrl,targetPath+'/'+dlUrl.split('/')[-1],host)
     logger.info("downloaded")
 
 # download channel chooser
-downloadStat = Stat(0)
+
 def chooseChannel(dlUrl,targetPath,host='',hexcode=''):
+    downloadStat = Stat(0)
     if ospath.isfile('wget.exe'):
         if host:
             logger.info("You targeted a HOST, so you cant use WGET extension. Using traditional download method.")
@@ -78,12 +84,17 @@ def chooseChannel(dlUrl,targetPath,host='',hexcode=''):
                 downloadStat.set(200)
     else: 
         logger.info("oh no! you didnt download wget extension! using traditional download method. file may broken.")
-    downloader(dlUrl,targetPath,hexcode)
+    if downloadStat.statusCode!=200:
+        downloadStat.set(code=downloader(dlUrl,targetPath,hexcode))
     if hexcode:
         if checkhex(targetPath,hexcode):
             logger.error("hexcode not match.")
         else:
             logger.debug("hexcode check passed.")
+    if downloadStat.statusCode!=200:
+        logger.error("download fail.")
+    else:
+        logger.debug(f"download success. status_code: {downloadStat.get()}")
 
 # self-build downloader
 def downloader(dlUrl,targetPath,host=''):
@@ -91,9 +102,8 @@ def downloader(dlUrl,targetPath,host=''):
     with open(targetPath,'wb')as f:
         logger.debug("download started using traditional method.")
         r = webget(dlUrl,headers={"Host":host})
-        downloadStat.set(r.status_code)
-        if downloadStat.get()[0]!=200:
-            logger.error("download faild.")
-        else:
-            logger.debug(f"download success. status_code: {downloadStat.get()}")
-        f.write(webget(dlUrl).content)
+        try: f.write(webget(dlUrl).content)
+        except Exception as err:
+            logger.fatal(f"Unable to Write file. Exception: {err}")
+            return 1000
+    return r.status_code
