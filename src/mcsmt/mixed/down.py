@@ -101,13 +101,19 @@ def downloader(dlUrl,targetPath,ip='',preferIPType="",dns="223.5.5.5",usedns=Fal
         logger.debug("download started using traditional method.")
         if ip or preferIPType or (dns and usedns):
             logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
+            dom = dlUrl.split('//')[1].split('/')[0].split(":")
             if not ip:
                 if not preferIPType:
                     preferIPType = 'A'
-                ip = doh(dlUrl.split('//')[1].split('/')[0],preferIPType,dns)
-            dlUrl2 = dlUrl.split('//'+dlUrl.split('//')[1].split('/')[0]+'/')
-            logger.warn(f"URL in use: {dlUrl2[0]+'//'+ip+dlUrl2[1]} , Headers in use: Host:{dlUrl.split('//')[1].split('/')[0]}")
-            r = webget(dlUrl2[0]+'//'+ip+dlUrl2[1],headers={"Host":dlUrl.split('//')[1].split('/')[0]},verify=False)
+                ips = doh(dom[0],preferIPType,dns)
+                ip = ips[randint(0,len(ips)-1)]
+                if preferIPType == 'AAAA':
+                    ip = '['+ip+']'
+            dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
+            ipdom = dom.copy() ; ipdom[0]=ip
+            stripdom = ':'.join(ipdom)
+            logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
+            r = webget(dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1],headers={"Host":dom[0]},verify=False)
         else:
             r = webget(dlUrl)
         try: f.write(r.content)
