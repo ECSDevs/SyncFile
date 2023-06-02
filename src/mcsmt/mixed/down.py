@@ -68,56 +68,79 @@ def downloadFile(dlUrl,targetPath=".",ip="",hexcode='',preferIPType='',dns='223.
 
 # download channel chooser
 
-def chooseChannel(dlUrl,targetPath,ip='',hexcode='',preferIPType="",dns="223.5.5.5",usedns=False):
-    downloadStat = Stat(0)
+def chooseChannel(dlUrl,targetPath,ip,hexcode,preferIPType,dns,usedns):
+    downloadStat = Stat(000)
     if ospath.isfile('wget.exe'):
-        if ip or preferIPType or (dns and usedns) :
-            logger.info("You targeted a HOST, so you cant use WGET extension. Using traditional download method.")
-        else:
-            logger.info('You have WGET extension! using wget to download.')
-            stat = ossystem('wget \"%s\" -O \"%s\"'%(dlUrl,targetPath))
-            if stat:
-                logger.warn("something went wrong. file may lose. trying to use traditional download method.")
-            else: 
-                downloadStat.set(200)
+        logger.info('You have WGET extension! using wget to download.')
+        stat = wget_downloader(dlUrl, ip)
+        if stat:
+            logger.warn("something went wrong. file may lose. trying to use traditional download method.")
+            downloadStat.set(000)
+        else: 
+            downloadStat.set(200)
     else: 
         logger.info("oh no! you didnt download wget extension! using traditional download method. file may broken.")
     if downloadStat.statusCode!=200:
-        downloadStat.set(code=downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns))
+        downloadStat.set(downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns))
     if hexcode:
         if checkhex(targetPath,hexcode):
             logger.error("hexcode not match.")
+            downloadStat.set(000)
         else:
             logger.debug("hexcode check passed.")
+            downloadStat.set(200)
     if downloadStat.statusCode!=200:
         logger.error("download fail.")
     else:
         logger.debug(f"download success. status_code: {downloadStat.get()}")
 
+def wget_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns):
+    if ip or usedns:
+        logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
+        dom = dlUrl.split('//')[1].split('/')[0].split(":")
+        if not ip:
+            if not preferIPType:
+                preferIPType = 'A'
+            ips = doh(dom[0],preferIPType,dns)
+            ip = ips[randint(0,len(ips)-1)]
+            if preferIPType == 'AAAA':
+                ip = '['+ip+']'
+        dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
+        ipdom = dom.copy() ; ipdom[0]=ip
+        stripdom = ':'.join(ipdom)
+        logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
+        return ossystem(f"wget \"{dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]}\" -H \"Host:{dom[0]}\" -O \"{targetPath}\"")
+    elif preferIPType:
+        preferIPTypes = ['A','AAAA']; argCodes = ['-4','-6']
+        return ossystem(f"wget \"{dlUrl}\" {argCodes[preferIPTypes.index(preferIPType)]} -O \"{targetPath}\"")
+    else:
+        return ossystem('wget \"%s\" -O \"%s\"'%(dlUrl,targetPath))
+
 # self-build downloader
-def downloader(dlUrl,targetPath,ip='',preferIPType="",dns="223.5.5.5",usedns=False):
+def builtin_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns):
     logger.debug("trying to open file")
-    with open(targetPath,'wb')as f:
-        logger.debug("download started using traditional method.")
-        if ip or preferIPType or (dns and usedns):
-            logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
-            dom = dlUrl.split('//')[1].split('/')[0].split(":")
-            if not ip:
-                if not preferIPType:
-                    preferIPType = 'A'
-                ips = doh(dom[0],preferIPType,dns)
-                ip = ips[randint(0,len(ips)-1)]
-                if preferIPType == 'AAAA':
-                    ip = '['+ip+']'
-            dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
-            ipdom = dom.copy() ; ipdom[0]=ip
-            stripdom = ':'.join(ipdom)
-            logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
-            r = webget(dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1],headers={"Host":dom[0]},verify=False)
-        else:
-            r = webget(dlUrl)
-        try: f.write(r.content)
-        except Exception as err:
-            logger.fatal(f"Unable to Write file. Exception: {err}")
-            return 1000
+    try:
+        with open(targetPath,'wb')as f:
+            logger.debug("download started using traditional method.")
+            if ip or preferIPType or usedns:
+                logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
+                dom = dlUrl.split('//')[1].split('/')[0].split(":")
+                if not ip:
+                    if not preferIPType:
+                        preferIPType = 'A'
+                    ips = doh(dom[0],preferIPType,dns)
+                    ip = ips[randint(0,len(ips)-1)]
+                    if preferIPType == 'AAAA':
+                        ip = '['+ip+']'
+                dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
+                ipdom = dom.copy() ; ipdom[0]=ip
+                stripdom = ':'.join(ipdom)
+                logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
+                r = webget(dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1],headers={"Host":dom[0]},verify=False)
+            else:
+                r = webget(dlUrl)
+            f.write(r.content)
+    except Exception as err:
+        logger.fatal(f"Unable to Write file. Exception: {err}")
+        return 000
     return r.status_code

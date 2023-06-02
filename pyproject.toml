@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcsmt"
-version = "0.2.10-hf1"
+version = "0.2.11"
 authors = [
   { name="lghilb-yu", email="2438926613@qq.com" },
 ]
@@ -21,7 +21,7 @@ classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Operating System :: OS Independent",
 ]
-dependencies = [ # Optional
+dependencies = [
   "dnspython",
   "Flask",
   "httpx",

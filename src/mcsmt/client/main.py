@@ -26,7 +26,7 @@ if clientcfg["requestURL"][-1]!='/':
 
 
 # get server client.json
-downloadFile(clientcfg["requestURL"]+'client.json',ip=ip,preferIPType=clientcfg.get("preferIPType",""),dns=clientcfg.get("dns","223.5.5.5"),usedns=clientcfg.get("useDNS",False))
+downloadFile(clientcfg["requestURL"]+'client.json',ip=ip,preferIPType=clientcfg.get("preferIPType","A"),dns=clientcfg.get("dns","223.5.5.5"),usedns=clientcfg.get("useDNS",False))
 with open("client.json")as f:
     config = loadJson(f.read())
 
