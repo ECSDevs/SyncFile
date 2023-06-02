@@ -72,7 +72,7 @@ def chooseChannel(dlUrl,targetPath,ip,hexcode,preferIPType,dns,usedns):
     downloadStat = Stat(000)
     if ospath.isfile('wget.exe'):
         logger.info('You have WGET extension! using wget to download.')
-        stat = wget_downloader(dlUrl, ip)
+        stat = wget_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns)
         if stat:
             logger.warn("something went wrong. file may lose. trying to use traditional download method.")
             downloadStat.set(000)
