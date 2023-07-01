@@ -1,23 +1,23 @@
 from httpx import get as webget
-from .down import downloadFile
-from json import load,dump
+from .down import downloader as downloadFile
+from json import load, dump
 
 # config
 myConfig = {}
 # save my config
-def saveConfig():
-    configfile = open('moddl.cfg','w')
+def saveConfig(config_path,encoding="UTF-8"):
+    configfile = open(config_path,'w',encoding=encoding)
     dump(myConfig,configfile)
     configfile.close()
     print("config saved")
 # load my config
-def loadConfig():
+def loadConfig(config_path,enc):
     global myConfig
     try: 
-        configfile = open('moddl.cfg')
+        configfile = open(config_path,encoding=enc)
         myConfig = load(configfile)
         configfile.close()
-    except: 
+    except FileNotFoundError:
         print("no config file found. loaded default config.")
         myConfig = dConfig
     else:
@@ -72,30 +72,50 @@ def showRequirements(reqdata):
     for req in reqdata:
         showModName(req["modId"],req["relationType"])
 
-loadConfig()
-mcv = input("Minecraft Version? : ")
-ml = int(input("ModLoader Type? (see mod_downloader_readme.txt): "))
-myConfig["headers"]["x-api-key"] = input("please enter your own api key :")
-saveConfig()
 
-print("Warning: Any silent crash could be due to network reasons! Make sure you have access to api.curseforge.com!")
+def do_job(config_path="./moddl.cfg",config_enc="UTF-8",**kwargs):
+    loadConfig(config_path,config_enc)
+    for i in kwargs:
+        myConfig[i]=eval(kwargs[i])
+    if myConfig.get("xapikey"):
+        myConfig["headers"]["x-api-key"] = myConfig["xapikey"]
+        del myConfig["xapikey"]
+    saveConfig(config_path,config_enc)
+    print("Warning: Any silent crash could be due to network reasons! Make sure you have access to api.curseforge.com!")
+    for name in myConfig["modl"]:
+        modinfo = searchMod(name,myConfig['mcv'],myConfig['ml'])["data"]
+        print("NAME:",modinfo[0]["name"])
+        showDescription(modinfo[0]["id"])
+        for version in modinfo[0]["latestFilesIndexes"]:
+            if version["gameVersion"]==myConfig['mcv'] and version["modLoader"]==myConfig['ml']:
+                filedata = downloadMod(version["fileId"],modinfo[0]["id"])
+                showRequirements(filedata["dependencies"])
+                break
 
-while True:
-    cmd1 = input('you want to (download/end): ')
-    if cmd1=='end':
-        break
-    cmd2 = input("mod name: ")
-    modinfo = searchMod(cmd2,mcv,ml)["data"]
-    for mod in range(len(modinfo)):
-        print("[%d]"%mod,modinfo[mod]["name"])
-    which = input("select: ")
-    if which:
-        which = int(which)
-    else:
-        continue
-    showDescription(modinfo[which]["id"])
-    for version in modinfo[which]["latestFilesIndexes"]:
-        if version["gameVersion"]==mcv and version["modLoader"]==ml:
-            filedata = downloadMod(version["fileId"],modinfo[which]["id"])
-            break
-    showRequirements(filedata["dependencies"])
+# loadConfig()
+# mcv = input("Minecraft Version? : ")
+# ml = int(input("ModLoader Type? (see mod_downloader_readme.txt): "))
+# myConfig["headers"]["x-api-key"] = input("please enter your own api key :")
+# saveConfig()
+#
+# print("Warning: Any silent crash could be due to network reasons! Make sure you have access to api.curseforge.com!")
+#
+# while True:
+#     cmd1 = input('you want to (download/end): ')
+#     if cmd1=='end':
+#         break
+#     cmd2 = input("mod name: ")
+#     modinfo = searchMod(cmd2,mcv,ml)["data"]
+#     for mod in range(len(modinfo)):
+#         print("[%d]"%mod,modinfo[mod]["name"])
+#     which = input("select: ")
+#     if which:
+#         which = int(which)
+#     else:
+#         continue
+#     showDescription(modinfo[which]["id"])
+#     for version in modinfo[which]["latestFilesIndexes"]:
+#         if version["gameVersion"]==mcv and version["modLoader"]==ml:
+#             filedata = downloadMod(version["fileId"],modinfo[which]["id"])
+#             break
+#     showRequirements(filedata["dependencies"])

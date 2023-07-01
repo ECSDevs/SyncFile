@@ -1,5 +1,5 @@
 from httpx import get as webget
-from os import path as ospath, system as ossystem
+from os import path, system
 from logging import getLogger
 from logging.handlers import TimedRotatingFileHandler
 from hashlib import sha512
@@ -11,136 +11,152 @@ logger = getLogger(__name__)
 logger.propagate = False
 
 # init log handler
-logHandler = TimedRotatingFileHandler(f"psbyuDownloaderModule_{__name__}.log",when='d')
-logHandler.setLevel("DEBUG") # always debug before stable release
-logger.setLevel("DEBUG") # ditto
+logHandler = TimedRotatingFileHandler(f"DownloaderModule_{__name__}.log", when='d')
+logHandler.setLevel("DEBUG")  # always debug before stable release
+logger.setLevel("DEBUG")  # ditto
 logger.addHandler(logHandler)
 
-# status message
-precompiledStatusMessages = {
-    200:"Ok.",
-    404:"Not found.",
-    502:"Server Crashed."
-}
 
 # check file's sha512 code
-def checkhex(path,hex):
-    with open(path,'rb')as f:
-        if sha512(f.read()).hexdigest() == hex:
+def check_hex(file_path, sha512hex):
+    with open(file_path, 'rb') as f:
+        if sha512(f.read()).hexdigest() == sha512hex:
             return True
         else:
             return False
-        
 
-# Status Code System
+
 class Stat:
-    def __init__(self,httpStatusCode,msg="",library=precompiledStatusMessages):
-        self.statusCode = httpStatusCode
+    def __init__(self, http_status_code, msg="", library: dict = None):
+        self.statusCode = http_status_code
+        if not library:
+            library = {200: "complete.", 404: "not found.", 502: "Server crash."}
         self.library = library
         if not msg:
-            msg = self.getMessageFromLibrary(self.statusCode,self.library)
+            msg = self.get_message_from_library(self.statusCode)
         self.message = msg
+
+    def get_message_from_library(self, code):
+        return self.library.get(code)
+
     def get(self):
-        return (self.statusCode,self.message)
-    def getMessageFromLibrary(self,code,library=precompiledStatusMessages):
-        return library.get(code)
-    def genMsg(self):
-        self.message = self.getMessageFromLibrary(self.statusCode,self.library)
-    def set(self,code=0,msg=''):
+        return self.statusCode, self.message
+
+    def generate_message(self):
+        self.message = self.get_message_from_library(self.statusCode)
+
+    def set(self, code=0, msg=''):
         if code:
             self.statusCode = code
             if msg:
                 self.message = msg
             else:
-                self.genMsg()
+                self.generate_message()
         else:
             if msg:
                 self.message = msg
             else:
-                self.genMsg()
+                self.generate_message()
 
 
 # file downloader
-def downloadFile(dlUrl,targetPath=".",ip="",hexcode='',preferIPType='',dns='223.5.5.5',usedns=False):
-    logger.info("start to download %s"%dlUrl.split('/')[-1])
-    chooseChannel(dlUrl,targetPath+'/'+dlUrl.split('/')[-1],ip,hexcode,preferIPType,dns,usedns)
-    logger.info("downloaded")
+def downloader(download_url, target_path=".", ip="", sha512hex='',
+               prefer_ip_type='', dns='223.5.5.5', use_dns: bool = False):
+    logger.info("Start downloading %s" % download_url.split('/')[-1])
+    choose_channel(download_url, target_path + '/' + download_url.split('/')[-1],
+                   ip, sha512hex, prefer_ip_type, dns, use_dns)
+    logger.info("Download completed")
+
 
 # download channel chooser
 
-def chooseChannel(dlUrl,targetPath,ip,hexcode,preferIPType,dns,usedns):
-    downloadStat = Stat(000)
-    if ospath.isfile('wget.exe'):
-        logger.info('You have WGET extension! using wget to download.')
-        stat = wget_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns)
+def choose_channel(download_url, target_path, ip, sha512hex, prefer_ip_type, dns, use_dns):
+    download_stat = Stat(000)
+    if path.isfile('wget.exe'):
+        logger.info('Okay! You have WGET to accelerate expansion! Downloading using wget!')
+        stat = wget_downloader(download_url, target_path, ip, prefer_ip_type, dns, use_dns)
         if stat:
-            logger.warn("something went wrong. file may lose. trying to use traditional download method.")
-            downloadStat.set(000)
-        else: 
-            downloadStat.set(200)
-    else: 
-        logger.info("oh no! you didnt download wget extension! using traditional download method. file may broken.")
-    if downloadStat.statusCode!=200:
-        downloadStat.set(downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns))
-    if hexcode:
-        if checkhex(targetPath,hexcode):
-            logger.error("hexcode not match.")
-            downloadStat.set(000)
+            logger.warning(
+                "There is a problem. The file may be lost. Attempting to download using traditional methods.")
+            download_stat.set(000)
         else:
-            logger.debug("hexcode check passed.")
-            downloadStat.set(200)
-    if downloadStat.statusCode!=200:
-        logger.error("download fail.")
+            download_stat.set(200)
     else:
-        logger.debug(f"download success. status_code: {downloadStat.get()}")
+        logger.info(
+            "Oh no! You didnt download the wget extension! Using traditional download methods. The file may be damaged."
+        )
+    if download_stat.statusCode != 200:
+        download_stat.set(builtin_downloader(download_url, target_path, ip, prefer_ip_type, dns, use_dns))
+    if sha512hex:
+        if check_hex(target_path, sha512hex):
+            logger.error("SHA512 does not match. The file may be damaged.")
+            download_stat.set(000)
+        else:
+            logger.debug("SHA512 matched.")
+            download_stat.set(200)
+    if download_stat.statusCode != 200:
+        logger.error("Download failed.")
+    else:
+        logger.debug(f"Download successful. Status code: {download_stat.get()}")
 
-def wget_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns):
-    if ip or usedns:
-        logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
-        dom = dlUrl.split('//')[1].split('/')[0].split(":")
-        if not ip:
-            if not preferIPType:
-                preferIPType = 'A'
-            ips = doh(dom[0],preferIPType,dns)
-            ip = ips[randint(0,len(ips)-1)]
-            if preferIPType == 'AAAA':
-                ip = '['+ip+']'
-        dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
-        ipdom = dom.copy() ; ipdom[0]=ip
-        stripdom = ':'.join(ipdom)
-        logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
-        return ossystem(f"wget \"{dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]}\" -H \"Host:{dom[0]}\" -O \"{targetPath}\"")
-    elif preferIPType:
-        preferIPTypes = ['A','AAAA']; argCodes = ['-4','-6']
-        return ossystem(f"wget \"{dlUrl}\" {argCodes[preferIPTypes.index(preferIPType)]} -O \"{targetPath}\"")
+
+def process_ip(dl_url, ip, preferred_ip_type, dns):
+    logger.warning("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
+    dom = dl_url.split('//')[1].split('/')[0].split(":")
+    if not ip:
+        if not preferred_ip_type:
+            preferred_ip_type = 'A'
+        if not dns:
+            dns = "223.6.6.6"
+        ips = doh(dom[0], preferred_ip_type, dns)
+        if not ips:
+            logger.fatal(
+                f'fatal occurred: specified domain {dom[0]} doesnt point to any {preferred_ip_type} record.'
+            )
+            raise Exception(
+                f"{__name__} Unable to continue running. \
+                The specified domain name {dom[0]} does not point to any {preferred_ip_type} records."
+            )
+        ip = ips[randint(0, len(ips) - 1)]
+    if ':' in ip:
+        ip = '[' + ip + ']'
+    dl_url = dl_url.split('//' + ':'.join(dom) + '/')
+    ip_domain = dom.copy()
+    ip_domain[0] = ip
+    dl_url = dl_url[0] + '//' + ':'.join(ip_domain) + '/' + dl_url[1]
+    logger.warning(f"URL in use: {dl_url} , Headers in use: Host:{dom[0]}")
+    return dl_url, dom[0]
+
+
+def wget_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
+    if ip or use_dns:
+        dl_url, dom = process_ip(dl_url, ip, prefer_ip_type, dns)
+        return system(f"wget \"{dl_url}\" --header=\"Host:{dom}\" --no-check-certificate -O \"{target_path}\"")
+    elif prefer_ip_type:
+        prefer_ip_types = ['A', 'AAAA']
+        arg_codes = ['-4', '-6']
+        return system(f"wget \"{dl_url}\" {arg_codes[prefer_ip_types.index(prefer_ip_type)]} -O \"{target_path}\"")
     else:
-        return ossystem('wget \"%s\" -O \"%s\"'%(dlUrl,targetPath))
+        return system('wget \"%s\" -O \"%s\"' % (dl_url, target_path))
+
 
 # self-build downloader
-def builtin_downloader(dlUrl,targetPath,ip,preferIPType,dns,usedns):
-    logger.debug("trying to open file")
+def builtin_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
+    logger.debug("Attempting to open file.")
     try:
-        with open(targetPath,'wb')as f:
+        with open(target_path, 'wb') as f:
             logger.debug("download started using traditional method.")
-            if ip or preferIPType or usedns:
-                logger.warn("An unstable test download method is being used: custom IP (or custom DNS resolution method)")
-                dom = dlUrl.split('//')[1].split('/')[0].split(":")
-                if not ip:
-                    if not preferIPType:
-                        preferIPType = 'A'
-                    ips = doh(dom[0],preferIPType,dns)
-                    ip = ips[randint(0,len(ips)-1)]
-                    if preferIPType == 'AAAA':
-                        ip = '['+ip+']'
-                dlUrl2 = dlUrl.split('//'+':'.join(dom)+'/')
-                ipdom = dom.copy() ; ipdom[0]=ip
-                stripdom = ':'.join(ipdom)
-                logger.warn(f"URL in use: {dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1]} , Headers in use: Host:{dom[0]}")
-                r = webget(dlUrl2[0]+'//'+stripdom+'/'+dlUrl2[1],headers={"Host":dom[0]},verify=False)
+            if ip or prefer_ip_type or use_dns:
+                dl_url, dom = process_ip(dl_url, ip, prefer_ip_type, dns)
+                r = webget(dl_url, headers={"Host": dom}, verify=False)
             else:
-                r = webget(dlUrl)
+                r = webget(dl_url)
             f.write(r.content)
     except Exception as err:
         logger.fatal(f"Unable to Write file. Exception: {err}")
         return 000
     return r.status_code
+
+def do_job(download_url, target_path=".", ip="", sha512hex='',
+               prefer_ip_type='', dns='223.5.5.5', use_dns="False"):
+    downloader(download_url,target_path,ip,sha512hex,prefer_ip_type,dns,eval(use_dns))

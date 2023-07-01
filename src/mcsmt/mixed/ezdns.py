@@ -10,5 +10,5 @@ def doh(name,type='A',server="223.5.5.5"):
                 targets.append(res[i+1].split('/')[0])
     return targets
 
-if __name__=="__main__":
-    print(doh(input("hostname:"),input("type:"),input("ns:")))
+def do_job(name,type='A',ns="223.5.5.5"):
+    print(doh(name,type,ns))
