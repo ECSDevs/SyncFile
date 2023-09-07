@@ -42,7 +42,7 @@ def get_online_config(client_config, ip):
 
 
 # match client and server files
-def check_local_files(config):
+def check_local_files(config,client_config):
     download_list = []
     remove_list = []
     for t in config:
@@ -56,17 +56,19 @@ def check_local_files(config):
                 remove_list.append([sf[i], t])
                 download_list.append([config[t][i][0], t, config[t][i][1]])
                 continue
-        for clientFile in files:
-            if clientFile not in sf:
-                remove_list.append([clientFile, t])
-                continue
+        if eval(client_config.get("deleteFileNotFoundInServer","True")):
+            for clientFile in files:
+                if clientFile not in sf:
+                    remove_list.append([clientFile, t])
+                    continue
     return download_list, remove_list
 
 
 # Processing the list after comparison
 def process(remove_list, download_list, client_config, ip):
-    for i in remove_list:
-        remove("%s/%s" % (i[1], i[0]))
+    if eval(client_config.get("deleteUnMatched","True")):
+        for i in remove_list:
+            remove("%s/%s" % (i[1], i[0]))
     for i in download_list:
         downloader(client_config["requestURL"] + i[0], i[1], ip, i[2], client_config.get("preferIPType", ""),
                    client_config.get("dns", "223.5.5.5"), client_config.get("useDNS", False))
@@ -78,5 +80,5 @@ def do_job(client_config_file_path="./Cconfig.json", client_config_encoding="UTF
     ip = get_ip(client_config)
     client_config = check_client_config(client_config)
     online_config = get_online_config(client_config, ip)
-    download_list, remove_list = check_local_files(online_config)
+    download_list, remove_list = check_local_files(online_config,client_config)
     process(remove_list, download_list, client_config, ip)

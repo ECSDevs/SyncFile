@@ -1,49 +1,51 @@
 from json import load, dump
 
-# mode select
-mode = input("mode(add/rewrite): ")
+def do_job():
 
-# mode
-if mode == "add":
-    with open("config.json")as f:
-        config=load(f)
-elif mode == "rewrite":
-    config=[]
-else:
-    print("not a valid mode")
+    # mode select
+    mode = input("mode(add/rewrite): ")
 
-# main program
-while True:
-    # continue or break
-    cmd = input("want(add/end):")
-    # if end
-    if cmd=="end":
-        # end the while
-        break
-    # if continue
-    elif cmd=="add":
-        # ask message
-        conf = [input("resourcePath:"),[],input("outputPath")]
-        while True:
-            # continue or break
-            cmdft=input("file type: continue?(yes/no):")
-            # if continue
-            if cmdft=="yes":
-                # add filetype
-                conf[1].append(input("fileType: "))
-            # if end
-            elif cmdft=="no":
-                # end the while
-                break
-            # if others
-            else:
-                print("not a valid command.")
-        # save to config
-        config.append(conf)
-    # others
+    # mode
+    if mode == "add":
+        with open("config.json")as f:
+            config=load(f)
+    elif mode == "rewrite":
+        config=[]
     else:
-        print("not a valid command.")
+        print("not a valid mode")
 
-# write to config file
-with open("config.json",'w')as f:
-    dump(config,f)
+    # main program
+    while True:
+        # continue or break
+        cmd = input("want(add/end):")
+        # if end
+        if cmd=="end":
+            # end the while
+            break
+        # if continue
+        elif cmd=="add":
+            # ask message
+            conf = [input("resourcePath:"),[],input("outputPath:")]
+            while True:
+                # continue or break
+                cmdft=input("file type: continue?(yes/no):")
+                # if continue
+                if cmdft=="yes":
+                    # add filetype
+                    conf[1].append(input("fileType: "))
+                # if end
+                elif cmdft=="no":
+                    # end the while
+                    break
+                # if others
+                else:
+                    print("not a valid command.")
+            # save to config
+            config.append(conf)
+        # others
+        else:
+            print("not a valid command.")
+
+    # write to config file
+    with open("config.json",'w')as f:
+        dump(config,f)
