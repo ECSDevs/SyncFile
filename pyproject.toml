@@ -4,16 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcsmt"
-version = "0.2.12.1"
+version = "0.2.13.0"
 authors = [
-  { name="lghilb-yu", email="2438926613@qq.com" },
+  { name="ECSDevs", email="psbash@groupmail.com" },
 ]
 description = "Simple file synchronization service (clients in the same package)"
 readme = "README.md"
 requires-python = ">=3.0"
 license = {file = "LICENCE"}
 maintainers = [
-  {name = "WhatTheHell", email = "wth@zyxblog.net" }
+  {name = "originalFactor", email = "2438926613@qq.com" }
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -29,6 +29,6 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/PsBash-Team/MCSMT"
-"Bug Tracker" = "https://github.com/PsBash-Team/MCSMT/issues"
+"Homepage" = "https://github.com/ECSDevs/MCSMT"
+"Bug Tracker" = "https://github.com/ECSDevs/MCSMT/issues"
 "Support Me" = "https://afdian.net/a/mcsmt_transfer_tool"
