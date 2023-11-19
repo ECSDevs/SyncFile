@@ -1,7 +1,6 @@
 **/tests/
 **/build/
 **/dist/
-**/.minecraft/
 **/__pycache__/
 *.ico
 *.json
@@ -11,3 +10,5 @@
 *.jar
 *.cfg
 *.log
+.github/
+.idea/

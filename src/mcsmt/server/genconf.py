@@ -25,10 +25,10 @@ def do_job():
         # if continue
         elif cmd=="add":
             # ask message
-            conf = [input("resourcePath:"),[],input("outputPath:")]
+            conf = [input("resourcePath:"),[],input("outputPath:"),eval(input("traverse?(0/1):"))]
             while True:
                 # continue or break
-                cmdft=input("file type: continue?(yes/no):")
+                cmdft=input("continue?(yes/no):")
                 # if continue
                 if cmdft=="yes":
                     # add filetype
