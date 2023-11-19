@@ -3,13 +3,6 @@ from os.path import isfile, abspath
 from json import loads as loadJson
 from . import *
 
-def safeListGet(l: list, i: int, d=None):
-    try:
-        e = l[i]
-    except IndexError:
-        e = d
-    return e
-
 def main():
     
     try:
@@ -33,7 +26,7 @@ def main():
     if not len(argv) > 1:
         print("No arguments found. exiting...")
         safe_exit()
-    if len(argv) < 3 or safeListGet(argv, 2, "{}")[0] == '{':
+    if len(argv) < 3 or utils.safeListGet(argv, 2, "{}")[0] == '{':
         for i in info.mcsmt_modules:
             if argv[1] in info.mcsmt_modules[i]:
                 argv.insert(1, i)
@@ -44,7 +37,7 @@ def main():
         print("Error: The specified instance does not exist.")
         safe_exit()
 
-    argvdic = loadJson(safeListGet(argv,3,'{}'))
+    argvdic = loadJson(utils.safeListGet(argv,3,'{}'))
     
     print("Running with arguments:", argv[1::])
     try:
