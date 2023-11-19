@@ -6,11 +6,14 @@ name = "pypi"
 [packages]
 httpx = "*"
 dnspython = "*"
-Flask = "*"
 watchdog = "*"
 
 
 [dev-packages]
+build = "*"
+twine = "*"
+hatchling = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.11"

@@ -2,13 +2,12 @@
 **/build/
 **/dist/
 **/__pycache__/
-*.ico
 *.json
 *.exe
-*.zip
 *.spec
-*.jar
-*.cfg
 *.log
+*.rt
 .github/
 .idea/
+build_executable/
+*.tag
