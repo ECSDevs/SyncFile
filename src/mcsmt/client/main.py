@@ -37,9 +37,8 @@ def check_client_config(client_config):
 
 # get server client.json
 def get_online_config(client_config, ip):
-    downloader(client_config["requestURL"] + 'index.json', "client.json", ip=ip, prefer_ip_type=client_config.get("preferIPType", ""),
-               dns=client_config.get("dns", "223.5.5.5"), use_dns=client_config.get("useDNS", False))
-    with open("client.json") as f:
+    downloader(client_config["requestURL"] + client_config.get("indexPath", 'client.json'), ip=ip, prefer_ip_type=client_config.get("preferIPType", ""), dns=client_config.get("dns", "223.5.5.5"),use_dns=client_config.get("useDNS", False))
+    with open(client_config.get("indexPath", 'client.json')) as f:
         config = load_json(f.read())
     return config
 

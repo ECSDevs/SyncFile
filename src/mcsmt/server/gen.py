@@ -4,7 +4,7 @@ from hashlib import sha512
 from ..utils import safeListGet
 
 
-def do_job(config="config.json",client="index.json"):
+def do_job(config="config.json",client="client.json"):
     # import config file
     configf = open(config)
     config = load(configf)
