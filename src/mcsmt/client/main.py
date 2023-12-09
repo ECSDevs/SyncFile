@@ -2,7 +2,8 @@ from json import loads as load_json
 from os import listdir, remove
 from ..mixed.down import downloader, check_hex
 from random import randint
-
+from threading import Thread
+from time import sleep
 
 # get config file
 def get_client_config(client_config_file_path="./Cconfig.json", enc="UTF-8"):
@@ -71,10 +72,29 @@ def process(remove_list, download_list, client_config, ip):
     if eval(client_config.get("deleteUnMatched","True")):
         for i in remove_list:
             remove("%s/%s" % (i[1], i[0]))
-    for i in download_list:
-        downloader(client_config["requestURL"] + i[0], i[1], ip, i[2], client_config.get("preferIPType", ""),
-                   client_config.get("dns", "223.5.5.5"), client_config.get("useDNS", False))
-
+    workers = client_config.get("downloadWorkers", 1)
+    workerlist = []
+    while len(download_list) or len(workerlist):
+        for i in download_list:
+            if len(workerlist) < workers:
+                workerlist.append(
+                    Thread(
+                        target=downloader, 
+                        args=(
+                            client_config["requestURL"] + i[0], 
+                            i[1], ip, i[2], 
+                            client_config.get("preferIPType", ""),
+                            client_config.get("dns", "223.5.5.5"), 
+                            client_config.get("useDNS", False)
+                        )
+                    )
+                )
+                workerlist[-1].start()
+                download_list.remove(i)
+        for i in workerlist:
+            if not i.is_alive():
+                workerlist.remove(i)
+        sleep(0.1)
 
 # work
 def do_job(client_config_file_path="./Cconfig.json", client_config_encoding="UTF-8"):

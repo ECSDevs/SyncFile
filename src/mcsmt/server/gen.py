@@ -22,11 +22,14 @@ def do_job(config="config.json",client="client.json"):
             if obj[2]+rp not in cc:
                 cc[obj[2]+rp] = []
             for file in files:
-                if file.split('.')[-1] in obj[1]:
+                if (file.split('.')[-1] in obj[1]) or ('' in obj[1]):
                     filename = (root+'/'+file) if root else file
                     with open(filename, 'rb') as f:
                         mhash = sha512(f.read()).hexdigest()
                     cc[obj[2]+rp].append([filename, mhash])
+
+    for obj in cc:
+        cc[obj] = set(cc[obj])
 
     # save to file
     ccf = open(client, 'w')

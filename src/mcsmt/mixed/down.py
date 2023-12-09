@@ -143,7 +143,10 @@ def wget_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
 # self-build downloader
 def builtin_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
     logger.debug("Attempting to open file.")
+    target_path_dir = '/'.join(target_path.split('/')[:-1:])
     try:
+        if not(path.exists(target_path_dir) and path.isdir(target_path_dir)):
+            path.mkdir(target_path_dir)
         with open(target_path, 'wb') as f:
             logger.debug("download started using traditional method.")
             if ip or prefer_ip_type or use_dns:
