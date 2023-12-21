@@ -10,7 +10,7 @@ def get_client_config(client_config_file_path="./Cconfig.json", enc="UTF-8"):
     try:
         with open(client_config_file_path, encoding=enc) as f:
             client_config = load_json(f.read())
-    except FileNotFoundError:
+    except FileNotFoundError: 
         raise Exception("config file not found")
     return client_config
 
