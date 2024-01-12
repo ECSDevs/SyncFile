@@ -1,21 +1,9 @@
 from httpx import get as webget
 from os import path, system
-from logging import getLogger
-from logging.handlers import TimedRotatingFileHandler
+from ..logger import logger
 from hashlib import sha512
 from .ezdns import doh
 from random import randint
-
-# init logger
-logger = getLogger(__name__)
-logger.propagate = False
-
-# init log handler
-logHandler = TimedRotatingFileHandler(f"DownloaderModule_{__name__}.log", when='d')
-logHandler.setLevel("DEBUG")  # always debug before stable release
-logger.setLevel("DEBUG")  # ditto
-logger.addHandler(logHandler)
-
 
 # check file's sha512 code
 def check_hex(file_path, sha512hex):

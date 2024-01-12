@@ -1,0 +1,19 @@
+{
+  "name": "mcsmt_electron_ui",
+  "version": "1.0.0",
+  "description": "Electron User Interface for MCSMT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ECSDevs/MCSMT.git"
+  },
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.1.2"
+  }
+}

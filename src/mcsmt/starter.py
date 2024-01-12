@@ -2,6 +2,7 @@ from sys import argv as sysArgv, exit as safe_exit
 from os.path import isfile, abspath
 from json import loads as loadJson
 from . import *
+from threading import Thread
 
 def main():
     
@@ -17,6 +18,10 @@ def main():
             print(f.read())
     except FileNotFoundError:
         print("MCSMT在线公告获取失败，请检查您的网络连接。这不会影响您使用该软件，也许是我们的问题。")
+
+    print("Starting HTTP Service...")
+    httpService = Thread(target=HTTPService.do_job)
+    httpService.start()
 
     if isfile("Margs.txt"):
         with open("Mconfig.json") as f:

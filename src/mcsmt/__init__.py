@@ -6,5 +6,7 @@ __all__ = [
    'server',
     'info',
    'starter',
-   'utils'
+   'utils',
+   'logger',
+   'HTTPService'
 ]

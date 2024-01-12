@@ -16,7 +16,7 @@ def get_client_config(client_config_file_path="./Cconfig.json", enc="UTF-8"):
 
 
 # init host
-def get_ip(client_config):
+def get_ip(client_config): 
     ip = client_config.get("ip", "")
     ips = client_config.get("ips", [])
     if not ip:
