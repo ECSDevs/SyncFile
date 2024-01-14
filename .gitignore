@@ -3,11 +3,12 @@
 **/dist/
 **/__pycache__/
 *.json
+!electron_ui/**/*
 *.exe
 *.spec
 *.log
 *.rt
-.github/
 .idea/
 build_executable/
 *.tag
+**/*.jar

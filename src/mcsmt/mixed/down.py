@@ -1,21 +1,9 @@
 from httpx import get as webget
 from os import path, system
-from logging import getLogger
-from logging.handlers import TimedRotatingFileHandler
+from ..logger import logger
 from hashlib import sha512
 from .ezdns import doh
 from random import randint
-
-# init logger
-logger = getLogger(__name__)
-logger.propagate = False
-
-# init log handler
-logHandler = TimedRotatingFileHandler(f"DownloaderModule_{__name__}.log", when='d')
-logHandler.setLevel("DEBUG")  # always debug before stable release
-logger.setLevel("DEBUG")  # ditto
-logger.addHandler(logHandler)
-
 
 # check file's sha512 code
 def check_hex(file_path, sha512hex):
@@ -143,7 +131,10 @@ def wget_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
 # self-build downloader
 def builtin_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
     logger.debug("Attempting to open file.")
+    target_path_dir = '/'.join(target_path.split('/')[:-1:])
     try:
+        if not(path.exists(target_path_dir) and path.isdir(target_path_dir)):
+            path.mkdir(target_path_dir)
         with open(target_path, 'wb') as f:
             logger.debug("download started using traditional method.")
             if ip or prefer_ip_type or use_dns:
@@ -160,3 +151,14 @@ def builtin_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
 def do_job(download_url, target_path=".", ip="", sha512hex='',
                prefer_ip_type='', dns='223.5.5.5', use_dns="False"):
     downloader(download_url,target_path,ip,sha512hex,prefer_ip_type,dns,eval(use_dns))
+    
+if __name__ == "__main__":
+    from sys import argv
+    argv = argv[1::]
+    kwargv  = {}
+    for a in argv:
+        if ":" in a:
+            x = a.split(":")
+            kwargv[x[0]]=':'.join(x[1::])
+            argv.remove(a)
+    do_job(*argv, **kwargv)

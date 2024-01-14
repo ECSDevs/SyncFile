@@ -1,5 +1,5 @@
 [[source]]
-url = "https://pypi.org/simple"
+url = "https://mirrors.aliyun.com/pypi/web/simple"
 verify_ssl = true
 name = "pypi"
 
@@ -7,7 +7,9 @@ name = "pypi"
 httpx = "*"
 dnspython = "*"
 watchdog = "*"
-
+fastapi = "*"
+uvicorn = "*"
+colorama = "*"
 
 [dev-packages]
 build = "*"

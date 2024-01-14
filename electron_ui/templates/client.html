@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户端模式</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入JQuery -->
+    <script src="../static/jquery.min.js"></script>
+    <style>
+        #console {
+            height: 500px;
+            overflow: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部菜单栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">MCSMT控制中心</a>
+            <!-- 左侧导航栏 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./index.html">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">客户端模式</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./toolbox.html">工具箱</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./undefined.html">服务端模式</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面内容 -->
+    <div class="container mt-5">
+        <p>客户端日志，更多功能开发中……</p>
+        <!-- 控制台样式的黑框 -->
+        <pre id="console" style="background-color: black; color: white; padding: 10px; border-radius: 5px;"></pre>
+        <!-- 按钮，用于前往设置界面 -->
+        <button id="settings" class="btn btn-primary">设置</button>
+    </div>
+
+    <!-- 引入Bootstrap JS -->
+    <script src="../static/bootstrap.bundle.min.js"></script>
+    <!-- 自定义JS -->
+    <script>
+        // 自动滚动
+        var console;
+        function autoScrollToBottom() {
+            if (isAutoScrollEnabled) {
+                console.scrollTop(console.scroolHeight());
+            }
+        }
+        // 请求日志
+        function requestLog() {
+            $.ajax({
+                url: 'http://127.0.0.1:36685/client/getlog',
+                type: 'GET',
+                success: function (data) {
+                    $('#console').append(data);
+                }
+            });
+        }
+        $(function () {
+            console = $('#console');
+            // 按钮点击事件
+            $('#settings').click(function () {
+                // 打开设置界面
+                window.open('./undefined.html', '_self');
+            });
+            var IntervalId = setInterval(requestLog, 1000);
+            // 自动滚动
+            var isAutoScrollEnabled = true;
+            setInterval(autoScrollToBottom, 1000);
+            console.on('scroll', function(){
+                if(this.clientHeight + this.scrollTop >= this.scrollHeight){
+                    isAutoScrollEnabled = true;
+                }else{
+                    isAutoScrollEnabled = false;
+                }
+            })
+        });
+    </script>
+</body>
+</html>

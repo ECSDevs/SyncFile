@@ -12,3 +12,14 @@ def doh(name,type='A',server="223.5.5.5"):
 
 def do_job(name,type='A',ns="223.5.5.5"):
     print(doh(name,type,ns))
+
+if __name__ == "__main__":
+    from sys import argv
+    argv = argv[1::]
+    kwargv  = {}
+    for a in argv:
+        if ":" in a:
+            x = a.split(":")
+            kwargv[x[0]]=':'.join(x[1::])
+            argv.remove(a)
+    do_job(*argv, **kwargv)

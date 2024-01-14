@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具箱</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <script src="../static/bootstrap.min.js"></script>
+    
+    <style>
+        #console {
+            height: 500px;
+            overflow: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部菜单栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">MCSMT控制中心</a>
+            <!-- 左侧导航栏 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link"  href="./index.html">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./client.html">客户端模式</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">工具箱</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./undefined.html">服务端模式</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面内容 -->
+    <div class="container mt-5">
+        <h1>工具箱</h1>
+        <p>杂七杂八的工具</p>
+        <!-- 任务：在此处插入四个功能入口 -->
+        <div class="row">
+            <div class="col-md-3">
+                <h3>DNS查询</h3>
+                <p><a href="./dnsrequest.html">点击进入</a></p>
+            </div>
+            <div class="col-md-3">
+                <h3>HTTP下载</h3>
+                <p><a href="./downloader.html">点击进入</a></p>
+            </div>
+            <div class="col-md-3">
+                <h3>Mod下载</h3>
+                <p><a href="./modDownload.html">点击进入</a></p>
+            </div>
+            <div class="col-md-3">
+                <h3>安装插件</h3>
+                <p><a href="./undefined.html">点击进入</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
