@@ -9,6 +9,7 @@ dnspython = "*"
 watchdog = "*"
 fastapi = "*"
 uvicorn = "*"
+colorama = "*"
 
 [dev-packages]
 build = "*"

@@ -151,3 +151,14 @@ def builtin_downloader(dl_url, target_path, ip, prefer_ip_type, dns, use_dns):
 def do_job(download_url, target_path=".", ip="", sha512hex='',
                prefer_ip_type='', dns='223.5.5.5', use_dns="False"):
     downloader(download_url,target_path,ip,sha512hex,prefer_ip_type,dns,eval(use_dns))
+    
+if __name__ == "__main__":
+    from sys import argv
+    argv = argv[1::]
+    kwargv  = {}
+    for a in argv:
+        if ":" in a:
+            x = a.split(":")
+            kwargv[x[0]]=':'.join(x[1::])
+            argv.remove(a)
+    do_job(*argv, **kwargv)

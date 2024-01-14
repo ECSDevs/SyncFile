@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mod下载</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入JQuery -->
+    <script src="../static/jquery.min.js"></script>
+    <style>
+        .console {
+            height: 500px;
+            overflow: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部菜单栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">MCSMT控制中心</a>
+            <!-- 左侧导航栏 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./index.html">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./client.html">客户端模式</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./toolbox.html">工具箱</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./undefined.html">服务端模式</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面内容 -->
+    <div class="container mt-5">
+        <h1>Mod搜索</h1>
+        <input type="text" class="form-control" id="modName" placeholder="请输入Mod名称" required>
+        <div class="mb-3">
+            <input type="text" class="form-control" id="mcVersion" placeholder="请输入MC版本" required>
+        </div>
+        <div class="mb-3">
+            <select class="form-control" id="modloader">
+                <option value="">请选择Mod加载器</option>
+                <option value="forge">Forge</option>
+                <option value="fabric">Fabric</option>
+                <option value="liteloader">LiteLoader</option>
+                <!-- 更多加载器选项 -->
+            </select>
+        </div>
+        
+        <button id="query" class="btn btn-primary">查询</button>
+        <p>查询结果</p>
+        <div class="mt-3 mb-3">
+            <ul id="modList" class="list-group">
+                <!-- 查询结果将以列表项形式添加到这里 -->
+            </ul>
+            <button id="previous_page" class="btn btn-primary">上一页</button>
+            <button id="next_page" class="btn btn-primary">下一页</button>
+        </div>        
+        <!-- 日志展示框 -->
+        <pre class="console" id="log" style="background-color: black; color: white; padding: 10px; border-radius: 5px;"></pre>
+        <!-- 按钮，用于前往设置界面 -->
+        <button id="settings" class="btn btn-primary">设置</button>
+    </div>
+
+    <!-- 引入Bootstrap JS -->
+    <script src="../static/bootstrap.bundle.min.js"></script>
+    <!-- 自定义JS -->
+    <script>
+        var console;
+        var modList;
+        var page=0;
+        // 获取日志
+        function getLog() {
+            $.ajax({
+                url: 'http://127.0.0.1:36685/client/getlog',
+                type: 'GET',
+                success: function (data) {
+                    console.append(data);
+                }
+            });
+        }
+        // 获取mod列表
+        function searchMods() {
+            $.ajax({
+                url: 'http://127.0.0.1:36685/mixed/moddown',
+                type: 'GET',
+                data: {
+                    mod: $('#modName').val(),
+                    ver: $('#mcVersion').val(),
+                    loader: $('#modloader').val(),
+                    page: page
+                },
+                success: function (data) {
+                    modList.empty();
+                    data.forEach(function (mod, index) {
+                        modList.append(
+                            '<li class="list-group-item d-flex justify-content-between align-items-center"> [' + index + '] ' +
+                            mod.name +
+                            '<button id="' + mod.id + '" class="btn btn-primary btn-sm download-btn">下载</button>' +
+                            '</li>'
+                        );
+                    });
+                }
+            });
+        }
+        // 下载Mod
+        function downloadMod(id){
+            $.ajax({
+                url: 'http://127.0.0.1:36685/mixed/moddown/download',
+                type: 'GET',
+                data: {
+                    id: id,
+                    ver: $('#mcVersion').val(),
+                    loader: $('#modloader').val()
+                },
+                success: function (data) {
+                    alert("开始下载！请关注下方日志显示窗口");
+                }
+            });
+        }
+        // 自动滚动
+        function autoScrollToBottom() {
+            if (isAutoScrollEnabled) {
+                console.scrollTop(console.scroolHeight());
+            }
+        }
+        // 添加下载
+        function addDownloadActivity() {
+            $(".download-btn").click(function () {
+                downloadMod(this.id);
+            });
+        }
+        $(function () {
+            // 设置变量
+            console = $('#log');
+            modList = $('#modList');
+            // 前往设置
+            $('#settings').click(function () {
+                window.open('./undefined.html', '_self');
+            });
+            // 自动更新日志
+            setInterval(getLog, 1000)
+            // 搜索Mod
+            $('#query').click(function () {
+                if ($('#domain').val() == '') {
+                    alert('请输入Mod名称');
+                } else {
+                    searchMods();
+                }
+            });
+            // 自动滚动
+            var isAutoScrollEnabled = true;
+            setInterval(autoScrollToBottom, 1000);
+            console.on('scroll', function(){
+                if(this.clientHeight + this.scrollTop >= this.scrollHeight){
+                    isAutoScrollEnabled = true;
+                }else{
+                    isAutoScrollEnabled = false;
+                }
+            })
+            // 上下页
+            $('#previous_page').click(function () {
+                page--;
+                if (page < 0) {
+                    page = 0;
+                }
+                searchMods();
+            });
+            $('#next_page').click(function () {
+                page++;
+                searchMods();
+            });
+            setInterval(addDownloadActivity, 1000)
+        });
+    </script>
+</body>
+</html>

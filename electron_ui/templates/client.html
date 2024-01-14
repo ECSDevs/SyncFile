@@ -37,7 +37,7 @@
                         <a class="nav-link" href="./toolbox.html">工具箱</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./server.html">服务端模式</a>
+                        <a class="nav-link" href="./undefined.html">服务端模式</a>
                     </li>
                 </ul>
             </div>
@@ -57,6 +57,14 @@
     <script src="../static/bootstrap.bundle.min.js"></script>
     <!-- 自定义JS -->
     <script>
+        // 自动滚动
+        var console;
+        function autoScrollToBottom() {
+            if (isAutoScrollEnabled) {
+                console.scrollTop(console.scroolHeight());
+            }
+        }
+        // 请求日志
         function requestLog() {
             $.ajax({
                 url: 'http://127.0.0.1:36685/client/getlog',
@@ -67,12 +75,23 @@
             });
         }
         $(function () {
+            console = $('#console');
             // 按钮点击事件
             $('#settings').click(function () {
                 // 打开设置界面
                 window.open('./undefined.html', '_self');
             });
             var IntervalId = setInterval(requestLog, 1000);
+            // 自动滚动
+            var isAutoScrollEnabled = true;
+            setInterval(autoScrollToBottom, 1000);
+            console.on('scroll', function(){
+                if(this.clientHeight + this.scrollTop >= this.scrollHeight){
+                    isAutoScrollEnabled = true;
+                }else{
+                    isAutoScrollEnabled = false;
+                }
+            })
         });
     </script>
 </body>

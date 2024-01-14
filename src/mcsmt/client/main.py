@@ -104,3 +104,14 @@ def do_job(client_config_file_path="./Cconfig.json", client_config_encoding="UTF
     online_config = get_online_config(client_config, ip)
     download_list, remove_list = check_local_files(online_config,client_config)
     process(remove_list, download_list, client_config, ip)
+
+if __name__ == "__main__":
+    from sys import argv
+    argv = argv[1::]
+    kwargv  = {}
+    for a in argv:
+        if ":" in a:
+            x = a.split(":")
+            kwargv[x[0]]=':'.join(x[1::])
+            argv.remove(a)
+    do_job(*argv, **kwargv)

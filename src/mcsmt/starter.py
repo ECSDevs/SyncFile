@@ -1,8 +1,12 @@
 from sys import argv as sysArgv, exit as safe_exit
-from os.path import isfile, abspath
+from os.path import isfile
 from json import loads as loadJson
 from . import *
+from .webApiRunner import do_job as webApi
+from .utils import safeListGet
 from threading import Thread
+from time import sleep
+from .info import mcsmt_modules
 
 def main():
     
@@ -19,30 +23,42 @@ def main():
     except FileNotFoundError:
         print("MCSMT在线公告获取失败，请检查您的网络连接。这不会影响您使用该软件，也许是我们的问题。")
 
-    print("Starting HTTP Service...")
-    httpService = Thread(target=HTTPService.do_job)
-    httpService.start()
-
+    argv = sysArgv
     if isfile("Margs.txt"):
         with open("Mconfig.json") as f:
-            argv = [""] + f.read().split()
-    else:
-        argv = sysArgv
+            argv += f.read().split()
+
+    
+    print("Starting HTTP Service...")
+    httpService = Thread(target=webApi,args=(("develop" if "--dev" in argv else "stable"),),daemon=True)
+    if "--dev" in argv: argv.remove("--dev")
+    httpService.start()
+    print("HTTP Service Started.")
+    
     if not len(argv) > 1:
-        print("No arguments found. exiting...")
+        try:
+            print("HTTP Service Only mode is turned on. Press Ctrl-C to stop.")
+            while True:
+                if not httpService.is_alive():
+                    break
+                sleep(0.1)
+        except KeyboardInterrupt:
+            pass
+        print("HTTP Service Stopped.")
         safe_exit()
-    if len(argv) < 3 or utils.safeListGet(argv, 2, "{}")[0] == '{':
-        for i in info.mcsmt_modules:
-            if argv[1] in info.mcsmt_modules[i]:
+
+    if len(argv) < 3 or safeListGet(argv, 2, "{}")[0] == '{':
+        for i in mcsmt_modules:
+            if argv[1] in mcsmt_modules[i]:
                 argv.insert(1, i)
                 break
         else:
             argv.insert(1,'')
-    if argv[1] not in info.mcsmt_modules or argv[2] not in info.mcsmt_modules[argv[1]]:
+    if argv[1] not in mcsmt_modules or argv[2] not in mcsmt_modules[argv[1]]:
         print("Error: The specified instance does not exist.")
         safe_exit()
 
-    argvdic = loadJson(utils.safeListGet(argv,3,'{}'))
+    argvdic = loadJson(safeListGet(argv,3,'{}'))
     
     print("Running with arguments:", argv[1::])
     try:

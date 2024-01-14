@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNS查询</title>
+    <title>HTTP下载</title>
     <!-- 引入Bootstrap CSS -->
     <link href="../static/bootstrap.min.css" rel="stylesheet">
     <!-- 引入JQuery -->
     <script src="../static/jquery.min.js"></script>
     <style>
-        #console {
+        .console {
             height: 500px;
             overflow: auto;
             display: block;
@@ -46,35 +46,57 @@
 
     <!-- 页面内容 -->
     <div class="container mt-5">
-        <h1>DNS查询</h1>
-        <input type="text" class="form-control" id="domain" placeholder="请输入域名" required>
-        <button id="query" class="btn btn-primary">查询</button>
-        <p>查询结果</p>
+        <h1>HTTP下载</h1>
+        <input type="text" class="form-control" id="link" placeholder="请输入链接地址" required>
+        <button id="query" class="btn btn-primary">下载</button>
+        <p>日志</p>
         <!-- 控制台样式的黑框 -->
-        <pre id="result" style="background-color: black; color: white; padding: 10px; border-radius: 5px;"></pre>
+        <pre class="console" id="result" style="background-color: black; color: white; padding: 10px; border-radius: 5px;"></pre>
         <!-- 按钮，用于前往设置界面 -->
         <button id="settings" class="btn btn-primary">设置</button>
+        <button id="stop" class="btn btn-primary">停止获取日志</button>
     </div>
 
     <!-- 引入Bootstrap JS -->
     <script src="../static/bootstrap.bundle.min.js"></script>
     <!-- 自定义JS -->
     <script>
+        var logWindowIntervalId;
+        function getLog() {
+            logWindowIntervalId = setInterval(function () {
+                $.ajax({
+                    url: 'http://127.0.0.1:36685/client/getlog',
+                    type: 'GET',
+                    success: function(data){
+                        $("#result").append(data);
+                    }
+                });
+            },1000);
+            // 自动滚动
+            function autoScrollToBottom() {
+                if (isAutoScrollEnabled) {
+                    $('#result').scrollTop(console.scroolHeight());
+                }
+            }
+            var isAutoScrollEnabled = true;
+            setInterval(autoScrollToBottom, 1000);
+            $("#result").on('scroll', function(){
+                if(this.clientHeight + this.scrollTop >= this.scrollHeight){
+                    isAutoScrollEnabled = true;
+                }else{
+                    isAutoScrollEnabled = false;
+                }
+            });
+        }
         function sendDNSRequest() {
             $.ajax({
-                url: 'http://127.0.0.1:36685/mixed/ezdns',
+                url: 'http://127.0.0.1:36685/mixed/downloader',
                 type: 'GET',
                 data: {
-                    domain: $('#domain').val()
+                    url: $('#link').val()
                 },
                 success: function (data) {
-                    $("#result").empty();
-                    data.forEach(function (item) {
-                        $("#result").append(item + '\n');
-                    });
-                },
-                error: function (data) {
-                    $("#result").text(data);
+                    getLog();
                 }
             });
         }
@@ -86,10 +108,13 @@
             });
             $('#query').click(function () {
                 if ($('#domain').val() == '') {
-                    alert('请输入域名');
+                    alert('请输入地址');
                 } else {
                     sendDNSRequest();
                 }
+            });
+            $('#stop').click(function(){
+                clearInterval(logWindowIntervalId);
             });
         });
     </script>

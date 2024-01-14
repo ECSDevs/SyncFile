@@ -11,3 +11,4 @@
 .idea/
 build_executable/
 *.tag
+**/*.jar

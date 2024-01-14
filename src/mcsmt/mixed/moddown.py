@@ -1,7 +1,6 @@
 from httpx import get as webget
 from .down import downloader as downloadFile
-from json import load, dump
-from os.path import exists
+from json import loads, dumps
 from ..logger import logger as l
 
 class Game:
@@ -21,10 +20,10 @@ class Minecraft(Game):
         l.info(f'set Minecraft.enableCurseforge = {self.enableCurseforge}')
         self.cfMLID = curseforgeModLoaderId.index(self.modLoader) if self.enableCurseforge else 0
         l.info(f'set Minecraft.cfMLID = {self.cfMLID}')
-        modrinthModLoaders = ["fabric", "forge", "liteloader", "modloader", "neoforge", "quilt", "rift"]
+        modrinthModLoaders = ["any", "fabric", "forge", "liteloader", "modloader", "neoforge", "quilt", "rift"]
         self.enableModrinth = True if self.modLoader in modrinthModLoaders else False
         l.info(f'set Minecraft.enableModrinth = {self.enableModrinth}')
-        self.mrMLID = [["categories:"+self.modLoader]] if self.enableModrinth else []
+        self.mrMLID = [["categories:"+self.modLoader]] if self.enableModrinth and self.modLoader!="any" else []
         l.info(f'set Minecraft.mrMLID = {self.mrMLID}')
         
 
@@ -45,41 +44,49 @@ class Curseforge:
         l.info(f'set Curseforge.headers = {self.headers}')
         self.game = game
         l.info(f'set Curseforge.game = {self.game}')
+        self.apiBaseUrl = "https://api.curseforge.com"
+        l.info(f'set Curseforge.apiBaseUrl = {self.apiBaseUrl}')
     @cfEnabled
     def searchMod(self,modname,page=0):
-        apiUrl = "https://api.curseforge.com/v1/mods/search"
+        apiUrl = f"{self.apiBaseUrl}/v1/mods/search"
         params = {
             'gameId': self.game.id,
-            'gameVersion': self.game.version,
-            'modLoaderType': self.game.modLoader,
+            'modLoaderType': self.game.cfMLID,
             'searchFilter': modname,
             'pageSize': 5,
             'index': page*5
         }
+        if self.game.version:
+            params["gameVersion"] = self.game.version
         r = webget(apiUrl, params = params, headers = self.headers)
         l.info(f'HTTP GET {apiUrl} params {params} result {r.text}')
         return r.json()["data"]
     @cfEnabled
     def getFile(self,data):
         for fileIndex in data["latestFilesIndexes"]:
-            if fileIndex["gameVersion"]==self.game.version and fileIndex["modLoader"]==self.game.modLoader:
+            if fileIndex["gameVersion"]==self.game.version and fileIndex["modLoader"]==self.game.cfMLID:
                 fileId = fileIndex["fileId"]
                 break
+        else:
+            l.info("No file found")
+            return {}
         for file in data["latestFiles"]:
             if file["id"]==fileId:
                 dt = file
                 break
+        else:
+            dt = webget(f'{self.apiBaseUrl}/v1/mods/{data["id"]}/files/{fileId}',headers=self.headers).json()["data"]
         l.info(f'getFile {dt}')
         return dt
     @cfEnabled
     def getDescription(self,modId):
-        apiUrl = "https://api.curseforge.com/v1/mods/%s/description"%modId
+        apiUrl = f"{self.apiBaseUrl}/v1/mods/%s/description"%modId
         r = webget(apiUrl,headers=self.headers).json()
         l.info(f'HTTP GET {apiUrl} result {r}')
         return r["data"]
     @cfEnabled
     def getMod(self,modId):
-        apiUrl = "https://api.curseforge.com/v1/mods/%s"%modId
+        apiUrl = f"{self.apiBaseUrl}/v1/mods/%s"%modId
         data = webget(apiUrl,headers=self.headers).json()
         l.info(f'HTTP GET {apiUrl} result {data}')
         return data["data"]
@@ -113,23 +120,23 @@ class Modrinth:
         url = "https://api.modrinth.com/v2/search"
         params = {
             "query": modname,
-            "facets": self.game.mrMLID + [["versions:"+self.game.version]],
+            "facets": dumps(self.game.mrMLID + ([["versions:"+self.game.version]] if self.game.version else [])),
             "offset": 5*page,
             "limit": 5
         }
-        res = webget(url,params,headers=self.headers).json()
+        res = webget(url,params=params,headers=self.headers).json()
         l.info(f'HTTP GET {url} params {params} result {res}')
         return res["hits"]
     @mrEnabled
-    def getVersions(self,project_id):
+    def getVersions(self,project_id,index=0,original=False):
         url = f'https://api.modrinth.com/v2/project/{project_id}/version'
         params = {
-            "loaders": self.game.modLoader,
-            "game_versions": self.game.version
+            "loaders": [self.game.modLoader],
+            "game_versions": [self.game.version]
         }
-        response = webget(url,params,headers=self.headers).json()
+        response = webget(url,params=params,headers=self.headers).json()
         l.info(f'HTTP GET {url} params {params} result {response}')
-        return response
+        return (response if original else response[index])
     @mrEnabled
     def getMod(self, project_id):
         url = f"https://api.modrinth.com/v2/project/{project_id}"
@@ -167,7 +174,7 @@ def do_job():
                 for mod in range(len(modinfoCF)):
                     print(f"[{mod}] {modinfoCF[mod]['name']}")
                 for mod in range(len(modinfoMR)):
-                    print(f"[{mod+len(modinfoCF)}] {modinfoMR[mod]['name']}")
+                    print(f"[{mod+len(modinfoCF)}] {modinfoMR[mod]['title']}")
                 x = input("Select: ")
                 if x:
                     break
@@ -176,7 +183,7 @@ def do_job():
                 continue
             if int(x)<len(modinfoCF):
                 print(cf.getDescription(modinfoCF[int(x)]["id"]))
-                file = cf.downloadMod(modinfoCF[int(x)])
+                file = cf.getFile(modinfoCF[int(x)])
                 downloadFile(file["downloadUrl"])
                 for dependency in cf.parseRequirements(file):
                     print(f'''{dependency["data"]["name"]} ({dependency["dependencyType"]})''')
@@ -195,3 +202,14 @@ def do_job():
             print('''Automaticly downloaded RequiredDependency.''')
     except KeyboardInterrupt:
         print("用户退出")
+
+if __name__ == "__main__":
+    from sys import argv
+    argv = argv[1::]
+    kwargv  = {}
+    for a in argv:
+        if ":" in a:
+            x = a.split(":")
+            kwargv[x[0]]=':'.join(x[1::])
+            argv.remove(a)
+    do_job(*argv, **kwargv)
