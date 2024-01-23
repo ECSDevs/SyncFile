@@ -31,7 +31,8 @@ jobs:
       - name: Publish to PyPI
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: pipenv run twine upload ./dist/*.whl -r pypi -u "__token__" -p "$PYPI_TOKEN"
+        shell: cmd
+        run: pipenv run twine upload ./dist/*.whl -r pypi -u "__token__" -p "%PYPI_TOKEN"
       - name: Setup Node.JS Environment
         uses: actions/setup-node@v4.0.1
         with:
