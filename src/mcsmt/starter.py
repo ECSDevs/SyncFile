@@ -30,8 +30,7 @@ def main():
 
     
     print("Starting HTTP Service...")
-    httpService = Thread(target=webApi,args=(("develop" if "--dev" in argv else "stable"),),daemon=True)
-    if "--dev" in argv: argv.remove("--dev")
+    httpService = Thread(target=webApi,daemon=True)
     httpService.start()
     print("HTTP Service Started.")
     
