@@ -29,4 +29,21 @@ jobs:
       - name: Build PyPI package
         run: pipenv run python -m build
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.11
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: pipenv run twine upload -r pypi -u "__token__" -p "$PYPI_TOKEN" dist/*
+      - name: Setup Node.JS Environment
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 18
+          architecture: x64
+          cache: npm
+          cache-dependency-path: ./electron_ui/package-lock.json
+      - name: Build Electron App
+        run: npm run make
+        working-directory: ./electron_ui
+      - name: Upload Binary File of Electron App
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: mcsmtUi
+          path: electron_ui/out
