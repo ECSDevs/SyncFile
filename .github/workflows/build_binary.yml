@@ -38,8 +38,9 @@ jobs:
         with:
           node-version: 18
           architecture: x64
-          cache: npm
-          cache-dependency-path: ./electron_ui/package-lock.json
+      - name: Install UI Dependencies
+        working-directory: ./electron_ui
+        run: npm i
       - name: Build Electron App
         run: npm run make
         working-directory: ./electron_ui
