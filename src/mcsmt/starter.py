@@ -15,7 +15,7 @@ def main():
             tpe = f.read()
     except FileNotFoundError:
         tpe = "full"
-    print(f"MCSMT Runner Version 0.2.13.2{tpe}. ")
+    print(f"MCSMT Runner Version 0.3.0.2{tpe}. ")
     mixed.down.downloader("http://files.psbyu.net/mcsmtNotifications.rt")
     try:
         with open("mcsmtNotifications.rt", encoding="utf-8")as f:
