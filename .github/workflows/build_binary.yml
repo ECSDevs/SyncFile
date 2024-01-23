@@ -6,15 +6,14 @@ jobs:
     permissions:
       id-token: write
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.1.1
       - name: Setup Python
         uses: actions/setup-python@v5.0.0
         with:
           python-version: 3.11
+          cache: pipenv
           architecture: x64
-      - name: Install Pipenv
-        run: pip install pipenv
-      - name: List existing files
-        run: ls
       - name: Install Dependencies
         run: pipenv install --dev
       - name: Build
