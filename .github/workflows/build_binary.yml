@@ -27,6 +27,6 @@ jobs:
       - name: Delete dist files
         run: rm dist/mcsmtGo.exe
       - name: Build PyPI package
-        run: pipenv run build
+        run: pipenv run python -m build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.11
