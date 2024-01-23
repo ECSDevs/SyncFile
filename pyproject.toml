@@ -24,7 +24,8 @@ classifiers = [
 dependencies = [
   "dnspython",
   "httpx",
-  "watchdog"
+  "watchdog",
+  "fastapi"
 ]
 
 [project.urls]
