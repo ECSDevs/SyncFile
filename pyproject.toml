@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcsmt"
-version = "0.3.0.1"
+version = "0.3.0.2"
 authors = [
   { name="ECSDevs", email="psbash@groupmail.com" },
 ]
