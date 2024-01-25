@@ -49,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4.2.0
         with:
           name: mcsmtUi
-          path: electron_ui/out
+          path: electron_ui/out/make
