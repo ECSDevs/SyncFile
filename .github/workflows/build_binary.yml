@@ -6,24 +6,47 @@ jobs:
     permissions:
       id-token: write
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.1.1
       - name: Setup Python
         uses: actions/setup-python@v5.0.0
         with:
           python-version: 3.11
-          cache: pipenv
           architecture: x64
+      - name: Install Pipenv
+        run: pip install pipenv
       - name: Install Dependencies
         run: pipenv install --dev
       - name: Build
         run: pipenv run pyinstaller -F src/mcsmtGo.py
       - name: Upload main binary files
-        uses: actions/upload-artifact@4.2.0
+        uses: actions/upload-artifact@v4.2.0
         with:
           name: mcsmtGo
           path: dist/mcsmtGo.exe
       - name: Delete dist files
         run: rm dist/mcsmtGo.exe
       - name: Build PyPI package
-        run: pipenv run build
+        run: pipenv run python -m build
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.11
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        shell: cmd
+        run: pipenv run twine upload ./dist/*.whl -r pypi -u "__token__" -p "%PYPI_TOKEN%"
+        continue-on-error: true
+      - name: Setup Node.JS Environment
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 18
+          architecture: x64
+      - name: Install UI Dependencies
+        working-directory: ./electron_ui
+        run: npm i
+      - name: Build Electron App
+        run: npm run make
+        working-directory: ./electron_ui
+      - name: Upload Binary File of Electron App
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: mcsmtUi
+          path: electron_ui/out/make

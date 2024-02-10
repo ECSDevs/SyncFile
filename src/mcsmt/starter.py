@@ -7,16 +7,11 @@ from .utils import safeListGet
 from threading import Thread
 from time import sleep
 from .info import mcsmt_modules
+from os.path import exists
 
 def main():
-    
-    try:
-        with open("type.tag")as f:
-            tpe = f.read()
-    except FileNotFoundError:
-        tpe = "full"
-    print(f"MCSMT Runner Version 0.2.13.2{tpe}. ")
     mixed.down.downloader("https://ecsdevs.github.io/mcsmt.txt")
+    print(f"MCSMT Runner Version 0.3.0.3 ")
     try:
         with open("mcsmt.txt", encoding="utf-8")as f:
             print(f.read())
