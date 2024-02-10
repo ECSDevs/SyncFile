@@ -16,9 +16,9 @@ def main():
     except FileNotFoundError:
         tpe = "full"
     print(f"MCSMT Runner Version 0.2.13.2{tpe}. ")
-    mixed.down.downloader("http://files.psbyu.net/mcsmtNotifications.rt")
+    mixed.down.downloader("https://ecsdevs.github.io/mcsmt.txt")
     try:
-        with open("mcsmtNotifications.rt", encoding="utf-8")as f:
+        with open("mcsmt.txt", encoding="utf-8")as f:
             print(f.read())
     except FileNotFoundError:
         print("MCSMT在线公告获取失败，请检查您的网络连接。这不会影响您使用该软件，也许是我们的问题。")
