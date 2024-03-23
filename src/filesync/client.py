@@ -1,6 +1,23 @@
+# Copyright (C) 2024 originalFactor
+# 
+# This file is part of MCSMT.
+# 
+# MCSMT is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# MCSMT is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with MCSMT.  If not, see <https://www.gnu.org/licenses/>.
+
 from json import loads as load_json
 from os import listdir, remove
-from ..mixed.down import downloader, check_hex
+from .down import downloader, check_hex
 from random import randint
 from threading import Thread
 from time import sleep
@@ -38,7 +55,7 @@ def check_client_config(client_config):
 
 # get server client.json
 def get_online_config(client_config, ip):
-    downloader(client_config["requestURL"] + client_config.get("indexPath", 'client.json'), ip=ip, prefer_ip_type=client_config.get("preferIPType", ""), dns=client_config.get("dns", "223.5.5.5"),use_dns=client_config.get("useDNS", False))
+    downloader(client_config["requestURL"] + client_config.get("indexPath", 'index.json'), ip=ip, prefer_ip_type=client_config.get("preferIPType", ""), dns=client_config.get("dns", "223.5.5.5"),use_dns=client_config.get("useDNS", False))
     with open(client_config.get("indexPath", 'client.json')) as f:
         config = load_json(f.read())
     return config
@@ -97,21 +114,30 @@ def process(remove_list, download_list, client_config, ip):
         sleep(0.1)
 
 # work
-def do_job(client_config_file_path="./Cconfig.json", client_config_encoding="UTF-8"):
-    client_config = get_client_config(client_config_file_path, client_config_encoding)
+if __name__=="__main__":
+    from argparse import ArgumentParser, FileType
+    parser = ArgumentParser(
+        prog="EFS Client Mode",
+        description="Like Git but without Version Control.",
+        usage="Pull something from server."
+    )
+    parser.add_argument(
+        "-c", "--config",
+        default="Cconfig.json",
+        type=FileType(),
+        help="the path of config file, by default it's `Cconfig.json`."
+    )
+    parser.add_argument(
+        "-e", "--encoding",
+        default="utf-8",
+        type=str,
+        help="the encoding of the config file."
+    )
+    args = parser.parse_args()
+    
+    client_config = get_client_config(args.config, args.encoding)
     ip = get_ip(client_config)
     client_config = check_client_config(client_config)
     online_config = get_online_config(client_config, ip)
     download_list, remove_list = check_local_files(online_config,client_config)
     process(remove_list, download_list, client_config, ip)
-
-if __name__ == "__main__":
-    from sys import argv
-    argv = argv[1::]
-    kwargv  = {}
-    for a in argv:
-        if ":" in a:
-            x = a.split(":")
-            kwargv[x[0]]=':'.join(x[1::])
-            argv.remove(a)
-    do_job(*argv, **kwargv)
