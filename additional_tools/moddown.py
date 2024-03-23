@@ -1,7 +1,8 @@
 from httpx import get as webget
-from .down import downloader as downloadFile
+from ..src.filesync.down import downloader as downloadFile
 from json import loads, dumps
-from ..logger import logger as l
+from logging import getLogger
+l = getLogger("modDownloader")
 
 class Game:
     def __init__(self,version:str,modLoader:str,gameID:int):

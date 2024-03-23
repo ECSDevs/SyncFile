@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcsmt"
-version = "0.3.0.3"
+name = "filesync"
+version = "0.3.1"
 authors = [
   { name="ECSDevs", email="psbash@groupmail.com" },
 ]
@@ -29,6 +29,6 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/ECSDevs/MCSMT"
-"Bug Tracker" = "https://github.com/ECSDevs/MCSMT/issues"
+"Homepage" = "https://github.com/ECSDevs/FileSync"
+"Bug Tracker" = "https://github.com/ECSDevs/FileSync/issues"
 "Support Me" = "https://afdian.net/a/mcsmt_transfer_tool"

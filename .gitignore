@@ -1,14 +1,9 @@
-**/tests/
-**/build/
-**/dist/
 **/__pycache__/
 *.json
-!electron_ui/**/*
 *.exe
 *.spec
 *.log
 *.rt
-.idea/
-build_executable/
 *.tag
 **/*.jar
+tests/
