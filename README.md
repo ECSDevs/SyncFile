@@ -1,9 +1,18 @@
 # MCSMT ( Minecraft Server Manage Tool)
 Version 3
-0.3.1 (v3X)
+0.3.1 (v3X) **FIXED**
+**NIGHTLY**, UNSTABLE.
+
+**TRY `v3-0.2.13.6` INSTEAD OF THIS**:
+```sh
+python -m pip install --user --force-reinstall mcsmt==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
+```
+*Notice: You must use an image repository because I have deleted the package in official repository.*
+
+This version **MAY CONTAINS** milions of bugs, so it's not a good idea to use it in production.
 
 ## Changes
-All changes in this release are **breaking and completely refactored** (refactored project architecture, removed redundant code, core implementation principles remain unchanged).
+All changes in this release are **breaking and completely refactored** (refactored project architecture, removed redundant code, but core implementation principles remain unchanged).
 Users of previous versions of the program may need to change their strategies to adapt to these changes and to receive subsequent security and feature updates.
 
 ### Specific Changes

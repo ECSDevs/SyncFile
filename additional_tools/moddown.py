@@ -1,7 +1,11 @@
+# IMPORTANT MESSAGE: The maintainece of this module will be discontinued in few days for somereasons. However, I'll try my best to let this module COMPLETE ASAP.
+# I'LL COME BACK LATER.
+
 from httpx import get as webget
-from ..src.filesync.down import downloader as downloadFile
+from filesync.down import downloader as downloadFile # You MUST install main package first to use this module.
 from json import loads, dumps
 from logging import getLogger
+from sys import environ
 l = getLogger("modDownloader")
 
 class Game:
