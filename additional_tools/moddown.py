@@ -2,7 +2,7 @@
 # I'LL COME BACK LATER.
 
 from httpx import get as webget
-from filesync.down import downloader as downloadFile # You MUST install main package first to use this module.
+from syncfile.down import downloader as downloadFile # You MUST install main package first to use this module.
 from json import loads, dumps
 from logging import getLogger
 from sys import environ

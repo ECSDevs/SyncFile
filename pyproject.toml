@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "filesync"
-version = "0.3.1"
+name = "syncfile"
+version = "0.3.1.1"
 authors = [
   { name="ECSDevs", email="psbash@groupmail.com" },
 ]
@@ -23,9 +23,7 @@ classifiers = [
 ]
 dependencies = [
   "dnspython",
-  "httpx",
-  "watchdog",
-  "fastapi"
+  "httpx"
 ]
 
 [project.urls]

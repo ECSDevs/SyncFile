@@ -16,11 +16,12 @@
 # along with MCSMT.  If not, see <https://www.gnu.org/licenses/>.
 
 from json import loads as load_json
-from os import listdir, remove
+from os import listdir, remove, mkdir
 from .down import downloader, check_hex
 from random import randint
 from threading import Thread
 from time import sleep
+from os.path import isfile, exists, isdir
 
 # get config file
 def get_client_config(client_config_file_path="./Cconfig.json", enc="UTF-8"):
@@ -66,29 +67,31 @@ def check_local_files(config,client_config):
     download_list = []
     remove_list = []
     for t in config:
+        # add automatic creation of folders
+        if not (exists(t) and isdir(t)): mkdir(t)
         files = listdir(t)
         sf = [_[0].split('/')[-1] for _ in config[t]]
         for i in range(len(sf)):
             if sf[i] not in files:
                 download_list.append([config[t][i][0], t, config[t][i][1]])
                 continue
-            if not check_hex("%s/%s" % (t, sf[i]), config[t][i][1]):
+            # add a condition to keep the config works.
+            if not check_hex("%s/%s" % (t, sf[i]), config[t][i][1]) and eval(client_config.get("deleteUnMatched","True")):
                 remove_list.append([sf[i], t])
                 download_list.append([config[t][i][0], t, config[t][i][1]])
-                continue
         if eval(client_config.get("deleteFileNotFoundInServer","True")):
             for clientFile in files:
-                if clientFile not in sf:
+                # fixed unexpected deletion of folders
+                if isfile(f'{t}/{clientFile}') and (clientFile not in sf):
                     remove_list.append([clientFile, t])
-                    continue
     return download_list, remove_list
 
 
 # Processing the list after comparison
 def process(remove_list, download_list, client_config, ip):
-    if eval(client_config.get("deleteUnMatched","True")):
-        for i in remove_list:
-            remove("%s/%s" % (i[1], i[0]))
+    # removed the condition of `deleteUnMatched`
+    for i in remove_list:
+        remove("%s/%s" % (i[1], i[0]))
     workers = client_config.get("downloadWorkers", 1)
     workerlist = []
     while len(download_list) or len(workerlist):

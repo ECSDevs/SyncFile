@@ -1,5 +1,5 @@
 from httpx import get as webget
-from os import path, system
+from os import path, system, mkdir
 from hashlib import sha512
 from random import choice
 from dns.message import make_query
@@ -23,9 +23,21 @@ def check_hex(file_path, sha512hex):
         return sha512(f.read()).hexdigest() == sha512hex
 
 # file downloader
-def downloader(download_url, target_path=".", ip="", sha512hex='', prefer_ip_type='', dns='223.5.5.5', use_dns=False):
+def downloader(download_url, target_path=".", ip="", sha512hex='', prefer_ip_type='', dns='223.5.5.5', use_dns=False, save_as=''):
     logger.info(f"Start downloading {download_url.split('/')[-1]}")
-    choose_channel(download_url, target_path + '/' + download_url.split('/')[-1], ip, sha512hex, prefer_ip_type, dns, use_dns)
+    # to prevent download without creating folder
+    if not (path.exists(target_path) and path.isdir(target_path)):
+        mkdir(target_path)
+    # add save as feature
+    choose_channel(
+        download_url, 
+        target_path + '/' + (save_as if save_as else path.split(download_url)[1]), 
+        ip, 
+        sha512hex, 
+        prefer_ip_type, 
+        dns, 
+        use_dns
+    )
     logger.info("Download completed")
 
 # download channel chooser

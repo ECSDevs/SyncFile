@@ -7,7 +7,6 @@ Version 3
 ```sh
 python -m pip install --user --force-reinstall mcsmt==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
 ```
-*Notice: You must use an image repository because I have deleted the package in official repository.*
 
 This version **MAY CONTAINS** milions of bugs, so it's not a good idea to use it in production.
 
@@ -26,12 +25,15 @@ Users of previous versions of the program may need to change their strategies to
 - Removed other code (binary builds, Watchdog, EZDNS, etc.)
 
 ## Trends
-Expected upcoming merges/removals:
-- Merge all code in `down.py` into one place and integrate into `client.py`
+Expected new features:
+- Current nothing
+
+Expected removals:
+- Current nothing
 
 ## Disclaimer
 Due to limited resources, bugs may not be fixed in a timely manner, please do not use for production purposes!
 
 ## Others
-[Github Wiki](https://github.com/ECSDevs/MCSMT/wiki/)
-
+- **Wiki for old versions**: [Github Wiki](https://github.com/ECSDevs/MCSMT/wiki/)
+- **Wiki for new versions(v3X) (Chinese)**: [v3x.sf.ptoe.cc](https://v3x.sf.ptoe.cc/)

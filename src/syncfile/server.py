@@ -16,9 +16,9 @@
 # along with MCSMT.  If not, see <https://www.gnu.org/licenses/>.
 
 from json import load, dump
-from os import walk, listdir
+from os import walk
 from hashlib import sha512
-from .utils import safeListGet
+from os.path import split
 
 if __name__ == "__main__":
     from argparse import ArgumentParser, FileType
@@ -42,29 +42,35 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # import config file
-    configf = open(args.config)
-    config = load(configf)
-    configf.close()
+    with open(args.config) as f:
+        config = load(f)
+
+    '''
+    Config structure:
+    ```json
+    [
+        ["resourcePath", ["extensions"], "targetPath"]
+    ]
+    '''
 
     # summon config file for client
-    # New: allow reverse join
+    # New: force traverse join
     cc = {}
     for obj in config:
-        if ':' in obj["resourcePath"]:
-            cc[obj["targetPath"]].append(obj["resourcePath"])
-        fx = walk(obj["resourcePath"])
-        for root, _, files in fx:
-            root = root.replace('\\','/') if root!='.' else ''
-            sr = '/'.join(root.split(obj["resourcePath"])[-1].split('/')[-1:0:-1])
-            rp = ('/'+sr)if sr else ''
-            if obj["targetPath"]+rp not in cc:
-                cc[obj["targetPath"]+rp] = []
+        # It's not allowed to use absolute path for targetPath or resourcePath.
+        if obj[0].startswith("/") or obj[2].startswith("/"):
+            raise Exception("Absolute path is not allowed for targetPath or resourcePath.")
+        # loop to add all files to the client config
+        for root, _, files in walk(obj[0]):
+            compatibleRoot = root[len(obj[0]):].replace("\\", "/")
+            targetPath = split(obj[1])[0] + (f'/{compatibleRoot}' if compatibleRoot else '')
+            if targetPath not in cc:
+                cc[targetPath] = []
             for file in files:
-                if (file.split('.')[-1] in obj["fileTypes"]) or ('' in obj["fileTypes"]):
-                    filename = (root+'/'+file) if root else file
-                    with open(filename, 'rb') as f:
-                        mhash = sha512(f.read()).hexdigest()
-                    cc[obj[2]+rp].append([filename, mhash])
+                if (file.split('.')[-1] in obj[1]) or ('*' in obj[1]): # add support for `*` in extensions
+                    with open(f'{root}/{file}', 'rb') as f:
+                        mhash = sha512(f.read(1024*1024)).hexdigest()
+                    cc[targetPath].append([(f'{compatibleRoot}/' if compatibleRoot else '') + file, mhash])
 
     for obj in cc:
         cc[obj] = set(cc[obj])
