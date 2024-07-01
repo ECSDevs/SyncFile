@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "syncfile"
-version = "0.3.1.1"
+version = "0.3.1.2"
 authors = [
   { name="ECSDevs", email="psbash@groupmail.com" },
 ]

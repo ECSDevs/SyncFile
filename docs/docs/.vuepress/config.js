@@ -18,11 +18,12 @@ export default defineUserConfig({
         text: '文档', 
         prefix: '/reference/',
         children: [
-          {text: '参考介绍', link: 'index.html'},
+          {text: '参考介绍', link: 'introduction.html'},
           {text: '服务端参考', link: 'server_config.html'},
           {text: '客户端参考', link: 'client_config.html'}
         ]
-      }
+      },
+      {text: '贡献手册', link: 'communicate.html'}
     ],
 
     sidebar: false,

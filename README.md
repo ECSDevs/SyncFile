@@ -1,14 +1,20 @@
-# MCSMT ( Minecraft Server Manage Tool)
-Version 3
-0.3.1 (v3X) **FIXED**
-**NIGHTLY**, UNSTABLE.
+# Syncfile
 
-**TRY `v3-0.2.13.6` INSTEAD OF THIS**:
+- Current Version (this tag/branch): `v3-0.3.1.2`
+- Current Status: `Beta`
+- Published at: [PyPI](https://pypi.org/project/syncfile/)
+
+## Notice
+
+The original `MCSMT` project has been renamed to `Syncfile`.
+
+**TRY `mcsmt v3-0.2.13.6` INSTEAD OF THIS**:
 ```sh
 python -m pip install --user --force-reinstall mcsmt==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
 ```
 
-This version **MAY CONTAINS** milions of bugs, so it's not a good idea to use it in production.
+The following versions of `mcsmt` has been `yanked`:
+- `0.2.13.0` ~ `0.2.13.1` (PyPI version)
 
 ## Changes
 All changes in this release are **breaking and completely refactored** (refactored project architecture, removed redundant code, but core implementation principles remain unchanged).

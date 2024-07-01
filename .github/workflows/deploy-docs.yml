@@ -26,7 +26,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
-
+      
+      - name: 进入目录
+        run: cd docs
+        
       - name: 安装依赖
         run: npm ci
 

@@ -9,3 +9,9 @@
 我们始终在[PyPI](https://pypi.org/project/syncfile/)发布版本。
 
 老版本在[这里](https://pypi.org/project/mcsmt/)。
+
+## [服务器](./server_config.md)
+
+## [客户端](./client_config.md)
+
+## [贡献手册]()

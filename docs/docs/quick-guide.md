@@ -106,7 +106,7 @@ python -m syncfile.client
 
 对于任何系统，仅需使用pip包管理器移除，如：
 ```sh
-<python> -m pip remove syncfile
+<python> -m pip uninstall syncfile
 ```
 其中`<python>`是您的Python解释器路径。
 
@@ -114,4 +114,4 @@ python -m syncfile.client
 
 您可以访问[Github](https://github.com/ECSDevs/SyncFile)获取更多信息、反馈Bugs、参与讨论等。
 
-如果您想要寻找更多的官方中文参考文档，请查看[参考文档](/reference/)
+如果您想要寻找更多的官方中文参考文档，请查看[参考文档](/reference/introduction.md)

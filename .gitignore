@@ -1,10 +1,2 @@
 **/__pycache__/
-*.json
-*.exe
-*.spec
-*.log
-*.rt
-*.tag
-**/*.jar
-tests/
 dist/

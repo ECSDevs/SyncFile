@@ -12,7 +12,7 @@ PYTHON = (
 
 print(
 f'''
-Elemental File Sync v0.3.1 FIXED
+Syncfile v0.3.1.2
 Easy transport from everywhere.
 
 Usage:
