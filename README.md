@@ -6,14 +6,14 @@
 
 ## Notice
 
-The original `MCSMT` project has been renamed to `Syncfile`.
+The original `Syncfile` project has been renamed to `Syncfile`.
 
-**TRY `mcsmt v3-0.2.13.6` INSTEAD OF THIS**:
+**TRY `Syncfile v3-0.2.13.6` INSTEAD OF THIS**:
 ```sh
-python -m pip install --user --force-reinstall mcsmt==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
+python -m pip install --user --force-reinstall Syncfile==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
 ```
 
-The following versions of `mcsmt` has been `yanked`:
+The following versions of `Syncfile` has been `yanked`:
 - `0.2.13.0` ~ `0.2.13.1` (PyPI version)
 
 ## Changes
@@ -21,7 +21,7 @@ All changes in this release are **breaking and completely refactored** (refactor
 Users of previous versions of the program may need to change their strategies to adapt to these changes and to receive subsequent security and feature updates.
 
 ### Specific Changes
-- Removed all code from the original `MCSMTApi`
+- Removed all code from the original `SyncfileApi`
 - Created `__main__.py` and added documentation
 - Included GPL license declaration
 - Moved `client/main.py` to `client.py`
@@ -41,5 +41,5 @@ Expected removals:
 Due to limited resources, bugs may not be fixed in a timely manner, please do not use for production purposes!
 
 ## Others
-- **Wiki for old versions**: [Github Wiki](https://github.com/ECSDevs/MCSMT/wiki/)
+- **Wiki for old versions**: [Github Wiki](https://github.com/ECSDevs/Syncfile/wiki/)
 - **Wiki for new versions(v3X) (Chinese)**: [v3x.sf.ptoe.cc](https://v3x.sf.ptoe.cc/)

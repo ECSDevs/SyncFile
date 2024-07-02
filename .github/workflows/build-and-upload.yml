@@ -16,6 +16,8 @@ jobs:
         with:
           python-version: 3.11
           architecture: x64
+      - name: Route to project directory
+        run: cd develop
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
       - name: Build PyPI package
