@@ -14,4 +14,4 @@
 
 ## [客户端](./client_config.md)
 
-## [贡献手册]()
+## [贡献手册](../communicate.md)

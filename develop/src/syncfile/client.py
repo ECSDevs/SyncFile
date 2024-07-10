@@ -18,10 +18,10 @@
 from json import load as load_json_file
 from os import listdir, remove, mkdir
 from .down import downloader, check_hex
-from random import randint
-from threading import Thread
+from random import choice
+from multiprocessing import Process
 from time import sleep
-from os.path import isfile, exists, isdir, split
+from os.path import exists, isdir, split, isfile
 from typing import List, Dict, Union
 from pydantic import BaseModel, field_validator
 
@@ -30,103 +30,100 @@ from pydantic import BaseModel, field_validator
 
 # config model
 class ClientConfig(BaseModel):
-    host : str = 'http://127.0.0.1:8000/'
-    indexPath : str = 'index.json'
-    localIndex : str = 'dumped_index.json'
-    ip : Union[str, List[str], None] = None
-    preferV6 : bool = False
-    dns : str = '223.5.5.5'
-    doh : bool = False
-    update : bool = True
-    removeNotfound : bool = True
-    workers : int = 5
+    host : str = 'http://127.0.0.1:8000/' # server url
+    indexPath : str = 'index.json' # index url
+    localIndex : str = 'dumped_index.json' # local index save path
+    ip : Union[str, List[str], None] = None # ip or ips
+    preferV6 : bool = False # like v6?
+    dns : str = '223.5.5.5' # DoH server
+    doh : bool = False # force use DoH
+    update : bool = True # delete unmatched
+    removeNotfound : bool = True # delete not found in index.json
+    workers : int = 5 # downloaders running in same time
 
     @field_validator('host')
     @classmethod
-    def correct(cls, v):
-        pass
+    def correctHost(cls, v:str)->str:
+        if not(v.startswith('https://') or v.startswith('http://')):
+            v = 'http://' + v
+        if not v.endswith('/'):
+            v += '/'
+        return v
+    
+    @field_validator('indexPath')
+    @classmethod
+    def correntIndexPath(cls, v:str)->str:
+        if v.startswith('/'): v = v[1:]
+        return v
+    
+    def get_ip(self)->Union[str, None]:
+        return (choice(self.ip) if isinstance(self.ip, list) else self.ip) if self.ip else None
 
 
-# init host
-def get_ip(client_config:Dict[str,Union[str,int,bool,List[str]]])->str: 
-    ip:str = client_config.get("ip", "")
-    ips:List[str] = client_config.get("ips", [])
-    if not ip:
-        if ips:
-            ip:str = ips[randint(0, len(ip) - 1)]
-    return ip
-
-
-# check client config file
-def check_client_config(client_config:Dict[str,Union[str,int,bool,List[str]]])->Dict[str,Union[str,int,bool,List[str]]]:
-    if not client_config.get("requestURL"):
-        raise Exception("No server URL")
-    if not (("https://" in client_config["requestURL"]) or ("http://" in client_config["requestURL"])):
-        client_config["requestURL"] = "http://" + client_config["requestURL"]
-    if client_config["requestURL"][-1] != '/':
-        client_config["requestURL"] += '/'
-    return client_config
-
+# Struct of Index
+Index = Dict[str, Dict[str, str]]
 
 # get server client.json
-def get_online_config(client_config:Dict[str,Union[str,int,bool,List[str]]], ip:str)->Dict[str,Dict[str,str]]:
+def get_online_config(client_config:ClientConfig)->Index:
     downloader(
-        download_url=client_config["requestURL"] + client_config.get("indexPath", 'index.json'), 
-        ip=ip, 
-        prefer_ip_type=client_config.get("preferIPType", ""), 
-        dns=client_config.get("dns", "223.5.5.5"),
-        use_dns=client_config.get("useDNS", False),
-        save_as=client_config.get("indexSaveAs", "dumped_index.json")
+        url=client_config.host + client_config.indexPath, 
+        ip=client_config.get_ip(), 
+        v6=client_config.preferV6, 
+        dns=client_config.dns,
+        use_dns=client_config.doh,
+        output=client_config.localIndex
     )
-    with open(client_config.get("indexSaveAs", 'dumped_index.json')) as f:
-        config:Dict[str,Dict[str,str]] = load_json_file(f)
+    with open(client_config.localIndex) as f:
+        config = load_json_file(f)
     return config
 
 
+
 # match client and server files
-def check_local_files(config:Dict[str,Dict[str,str]],client_config:Dict[str,Union[str,int,bool,List[str]]]):
+def check_local_files(config:Index,client_config:ClientConfig):
     download_list = []
     remove_list = []
-    for t in config:
+    for targetDir, srvfiles in config.items():
         # add automatic creation of folders
-        if not (exists(t) and isdir(t)): mkdir(t)
-        files = listdir(t)
-        for filepath in config[t].keys():
-            if split(filepath)[1] not in files:
-                download_list.append([filepath, t, config[t][filepath]])
+        if not (exists(targetDir) and isdir(targetDir)): mkdir(targetDir)
+        localfiles = listdir(targetDir)
+        for filepath, filehash in srvfiles.items():
+            filename = split(filepath)[1]
+            localPath = f'{targetDir}/{filename}'
+            if filename not in localfiles:
+                download_list.append([filepath, localPath, filehash])
                 continue
             # add a condition to keep the config works.
-            if not check_hex("%s/%s" % (t, sf[i]), config[t][i][1]) and client_config.get("deleteUnMatched",True):
-                remove_list.append([sf[i], t])
-                download_list.append([config[t][i][0], t, config[t][i][1]])
-        if eval(client_config.get("deleteFileNotFoundInServer",True)):
-            for clientFile in files:
-                # fixed unexpected deletion of folders
-                if isfile(f'{t}/{clientFile}') and (clientFile not in sf):
-                    remove_list.append([clientFile, t])
+            if not check_hex(localPath, filehash) and client_config.update:
+                remove_list.append(localPath)
+                download_list.append([filepath, localPath, filehash])
+            localfiles.remove(filename)
+        if client_config.removeNotfound:
+            remove_list += list([f'{targetDir}/{_}' for _ in localfiles if isfile(f'{targetDir}/{_}')])
     return download_list, remove_list
 
 
 # Processing the list after comparison
-def process(remove_list, download_list, client_config, ip):
+def process(remove_list:List[str], download_list:List[List[str]], config:ClientConfig):
     # removed the condition of `deleteUnMatched`
     for i in remove_list:
-        remove("%s/%s" % (i[1], i[0]))
-    workers = client_config.get("downloadWorkers", 1)
+        remove(i)
     workerlist = []
     while len(download_list) or len(workerlist):
         for i in download_list:
-            if len(workerlist) < workers:
+            if len(workerlist) < config.workers:
                 workerlist.append(
-                    Thread(
+                    Process(
                         target=downloader, 
-                        args=(
-                            client_config["requestURL"] + i[0], 
-                            i[1], ip, i[2], 
-                            client_config.get("preferIPType", ""),
-                            client_config.get("dns", "223.5.5.5"), 
-                            client_config.get("useDNS", False)
-                        )
+                        kwargs={
+                            'url': config.host + i[0], 
+                            'output': i[1], 
+                            'ip': config.get_ip(), 
+                            'sha512hex': i[2], 
+                            'v6': config.preferV6,
+                            'dns': config.dns, 
+                            'use_dns': config.doh
+                        }
                     )
                 )
                 workerlist[-1].start()
@@ -152,9 +149,7 @@ if __name__=="__main__":
     )
     args = parser.parse_args()
     
-    client_config = load_json_file(args.config)
-    ip = get_ip(client_config)
-    client_config = check_client_config(client_config)
-    online_config = get_online_config(client_config, ip)
+    client_config = ClientConfig(**(load_json_file(args.config)))
+    online_config = get_online_config(client_config)
     download_list, remove_list = check_local_files(online_config,client_config)
-    process(remove_list, download_list, client_config, ip)
+    process(remove_list, download_list, client_config)

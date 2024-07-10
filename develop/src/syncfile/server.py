@@ -23,7 +23,7 @@ from logging import getLogger
 
 def contains(x:str, y:List[str])->bool:
     for i in y:
-        if x.startswith(i):
+        if i in x:
             return True
     return False
 
@@ -82,8 +82,7 @@ if __name__ == "__main__":
             if targetPath not in cc:
                 cc[targetPath] = {}
             for file in files:
-                if ((file.split('.')[-1] in obj[1]) or ('*' in obj[1])) and \
-                    (f'{compatibleRoot+"/" if compatibleRoot else ""}{file}' not in obj[3]): # add support for `*` in extensions
+                if ((file.split('.')[-1] in obj[1]) or ('*' in obj[1])) and not contains(file,obj[3]): # add support for `*` in extensions
                     with open(f'{root}/{file}', 'rb') as f:
                         mhash = sha512(f.read(1024*1024)).hexdigest()
                     targetFileName = (root+'/' if '.' not in root else root[2:])+file
