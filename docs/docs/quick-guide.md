@@ -9,7 +9,7 @@ sidebarDepth: 2
 
 ## 介绍
 
-syncfile 是 Elementary (前元素云) 开源软件团队的成员 OriginalFactor 独立编写的 Python 脚本程序。
+syncfile 是 Elementary (前元素云) 开源软件团队的成员 ECSDevs 独立编写的 Python 脚本程序。
 该程序能够较为简单的在设备间**克隆**文件。是替代SMB协议的可选方案。
 
 本方案适用于多个小文件的克隆，大文件克隆性能不佳。（取决于服务端侧使用的HTTP服务器解决方案）
