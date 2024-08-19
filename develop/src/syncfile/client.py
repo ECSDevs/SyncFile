@@ -1,4 +1,4 @@
-# Copyright (C) 2024 originalFactor
+# Copyright (C) 2024 ECSDevs
 # 
 # This file is part of Syncfile.
 # 
@@ -22,7 +22,7 @@ from random import choice
 from multiprocessing import Process
 from time import sleep
 from os.path import exists, isdir, split, isfile
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
 from pydantic import BaseModel, field_validator
 
 
@@ -80,7 +80,7 @@ def get_online_config(client_config:ClientConfig)->Index:
 
 
 # match client and server files
-def check_local_files(config:Index,client_config:ClientConfig):
+def check_local_files(config:Index,client_config:ClientConfig)->Tuple[List[List[str]],List[str]]:
     download_list = []
     remove_list = []
     for targetDir, srvfiles in config.items():

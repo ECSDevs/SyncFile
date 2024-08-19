@@ -6,11 +6,11 @@
 
 ## Notice
 
-The original `Syncfile` project has been renamed to `Syncfile`.
+The original `MCSMT` project has been renamed to `Syncfile`.
 
-**TRY `Syncfile v3-0.2.13.6` INSTEAD OF THIS**:
+**TRY `MCSMT v3-0.2.13.6` INSTEAD OF THIS**:
 ```sh
-python -m pip install --user --force-reinstall Syncfile==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
+python -m pip install --user --force-reinstall mcsmt==0.2.13.6 -i https://mirrors.tuna.tsinghua.edu.cn/pypi/simple
 ```
 
 The following versions of `Syncfile` has been `yanked`:

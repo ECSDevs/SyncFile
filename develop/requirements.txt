@@ -1,5 +1,6 @@
 httpx
 dnspython
+pydantic
 build
 twine
 hatchling

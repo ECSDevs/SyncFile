@@ -139,13 +139,19 @@ def wget_downloader(dl_url:str, target_path:str, headers:Dict[str,str], verify:b
     200)
 
 def builtin_downloader(dl_url:str, target_path:str, headers:Dict[str,str], verify:bool=True, *args, **kwargs)->int:
-    logger.debug(f"Attempting to open {target_path}.")
     try:
-        with open(target_path, 'wb') as f:
-            logger.debug(f"{target_path} download started using traditional method.")
-            r = webget(dl_url, headers=headers, verify=verify, *args, **kwargs)
-            f.write(r.content)
+        logger.debug(f"{target_path} download started using traditional method.")
+        r = webget(dl_url, headers=headers, verify=verify, *args, **kwargs)
+        if r.status_code==200:
+            logger.debug(f"Trying to open {target_path} and write response...")
+            try:
+                with open(target_path, 'wb') as f:
+                    f.write(r.content)
+            except Exception as err:
+                logger.error(f"Unable to write {target_path}. FileSystem Exception: {err}.")
+        else:
+            logger.error(f"Unable to download {target_path}. HTTP Status Code {r.status_code}.")
     except Exception as err:
-        logger.fatal(f"Unable to Write {target_path}. Exception: {err}")
+        logger.error(f"Unable to download {target_path}. Network Exception: {err}.")
         return 000
     return r.status_code
