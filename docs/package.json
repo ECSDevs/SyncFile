@@ -2,7 +2,7 @@
   "name": "syncfile-docs",
   "version": "0.0.1",
   "description": "Elemental SyncFile Documents",
-  "license": "GPLv3",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "docs:build": "vuepress build docs",
